@@ -1,4 +1,4 @@
-﻿namespace AIWebApi.PreWork;
+﻿namespace AIWebApi._00_PreWork;
 
 public record ResponseDto(int Code, string Message) { }
 

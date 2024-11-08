@@ -1,6 +1,7 @@
 using AIWebApi;
+using AIWebApi._00_PreWork;
+using AIWebApi._01_FillForm;
 using AIWebApi.Core;
-using AIWebApi.PreWork;
 
 using NLog.Web;
 
@@ -10,11 +11,13 @@ builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 // Core services
-builder.Services.AddSingleton<IHttpService, HttpService>();
-builder.Services.AddSingleton<IJsonService, JsonService>();
+builder.Services.AddScoped<IHttpService, HttpService>();
+builder.Services.AddScoped<IJsonService, JsonService>();
+builder.Services.AddScoped<IOpenAIService, OpenAIService>();
 
-// App services
-builder.Services.AddSingleton<IPreWorkService, PreWorkService>();
+// App controllers
+builder.Services.AddScoped<IFillFormController, FillFormController>();
+builder.Services.AddScoped<IPreWorkController, PreWorkController>();
 
 builder.WebHost.UseNLog();
 

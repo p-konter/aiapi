@@ -1,28 +1,29 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi.PreWork;
+namespace AIWebApi._00_PreWork;
 
-public interface IPreWorkService
+public interface IPreWorkController
 {
     Task<ResponseDto> RunPreWork();
 }
 
-public class PreWorkService(IConfiguration configuration, IHttpService httpService, ILogger<PreWorkService> logger) : IPreWorkService
+public class PreWorkController(IConfiguration configuration, IHttpService httpService, ILogger<PreWorkController> logger) : IPreWorkController
 {
     private readonly IConfiguration _configuration = configuration;
     private readonly IHttpService _httpService = httpService;
-    private readonly ILogger<PreWorkService> _logger = logger;
+    private readonly ILogger<PreWorkController> _logger = logger;
+
+    private readonly Uri GetDataUrl = new("https://poligon.aidevs.pl/dane.txt");
+    private readonly Uri PostDataUrl = new("https://poligon.aidevs.pl/verify");
 
     private const string TaskName = "POLIGON";
-    private const string GetDataConfigName = "PreWorkData";
-    private const string PostDataConfigName = "PreWorkPost";
     private const string ApiKeyConfigName = "ApiKey";
 
     private static readonly string[] separator = ["\r\n", "\n"];
 
     private async Task<IList<string>> FetchData()
     {
-        string data = await _httpService.GetString(GetDataConfigName);
+        string data = await _httpService.GetString(GetDataUrl);
         return new List<string>(data.Split(separator, StringSplitOptions.RemoveEmptyEntries));
     }
 
@@ -30,15 +31,17 @@ public class PreWorkService(IConfiguration configuration, IHttpService httpServi
     {
         string apiKey = _configuration.GetStrictValue<string>(ApiKeyConfigName);
         RequestDto request = new(TaskName, apiKey, values);
-        return await _httpService.PostJson<ResponseDto>(PostDataConfigName, request);
+        return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
     }
 
     public async Task<ResponseDto> RunPreWork()
     {
         IList<string> values = await FetchData();
+        _logger.LogInformation("Fetched values are: {values}", values);
 
-        _logger.LogInformation("Values {values}", values);
+        ResponseDto answer = await PostData(values);
+        _logger.LogInformation("Final answer is {answer}", answer.Message);
 
-        return await PostData(values);
+        return answer;
     }
 }
