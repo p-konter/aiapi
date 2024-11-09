@@ -9,14 +9,35 @@ public interface IJsonService
     T Deserialize<T>(string data);
 }
 
-public class JsonService : IJsonService
+public class JsonService(ILogger<JsonService> logger) : IJsonService
 {
-    public string Serialize(object data) => JsonSerializer.Serialize(data, GetJsonOptions());
+    private readonly ILogger<JsonService> _logger = logger;
+
+    public string Serialize(object data)
+    {
+        try
+        {
+            return JsonSerializer.Serialize(data, GetJsonOptions());
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to serialize JSON: {data}", data);
+            throw;
+        }
+    }
 
     public T Deserialize<T>(string data)
     {
-        T? obj = JsonSerializer.Deserialize<T>(data, GetJsonOptions());
-        return obj is null ? throw new EmptyJsonException() : obj;
+        try
+        {
+            T? obj = JsonSerializer.Deserialize<T>(data, GetJsonOptions());
+            return obj is null ? throw new EmptyJsonException() : obj;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Failed to deserialize JSON: {data}", data);
+            throw;
+        }
     }
 
     private static JsonSerializerOptions GetJsonOptions()
