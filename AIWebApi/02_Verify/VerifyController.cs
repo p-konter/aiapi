@@ -52,4 +52,4 @@ public class VerifyController(IConfiguration configuration, IHttpService httpSer
     }
 }
 
-public record VerifyDto(string Text, int MsgID) { }
+public record VerifyDto(string Text, int MsgID);

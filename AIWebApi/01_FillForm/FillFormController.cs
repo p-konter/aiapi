@@ -91,4 +91,4 @@ public class FillFormController(IConfiguration configuration, IHttpService httpS
     }
 }
 
-public record FillFormResponseDto(string Flag, string FileUrl) { }
+public record FillFormResponseDto(string Flag, string FileUrl);

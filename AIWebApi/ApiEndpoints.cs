@@ -1,6 +1,8 @@
 ﻿using AIWebApi._00_PreWork;
 using AIWebApi._01_FillForm;
 using AIWebApi._02_Verify;
+using AIWebApi._03_FileCorrection;
+using AIWebApi._04_Labirynth;
 
 namespace AIWebApi;
 
@@ -20,6 +22,18 @@ public static class ApiEndpoints
         app.MapGet("/verify", ApiEndpoints.Verify)
             .Produces<VerifyDto>()
             .WithDescription("Verify robot")
+            .WithTags("Api for AI_devs3");
+        app.MapGet("/correctFile", ApiEndpoints.CorrectFile)
+            .Produces<ResponseDto>()
+            .WithDescription("Correct json file")
+            .WithTags("Api for AI_devs3");
+        app.MapPost("/writeEasyLabirynthPrompt", ApiEndpoints.RunLabirynthEasy)
+            .Produces<string>()
+            .WithDescription("Run through labirynth easy way")
+            .WithTags("Api for AI_devs3");
+        app.MapGet("/writeHardLabirynthPrompt", ApiEndpoints.RunLabirynthHard)
+            .Produces<string>()
+            .WithDescription("Run through labirynth hard way - INCOMPLETE")
             .WithTags("Api for AI_devs3");
 
         return app;
@@ -41,5 +55,23 @@ public static class ApiEndpoints
     {
         VerifyDto response = await controller.RunVerify();
         return Results.Json(response);
+    }
+
+    public static async Task<IResult> CorrectFile(IFileCorrectionController controller)
+    {
+        ResponseDto response = await controller.RunFileCorrection();
+        return Results.Json(response);
+    }
+
+    public static async Task<IResult> RunLabirynthEasy(ILabirynthController controller)
+    {
+        string prompt = await controller.WriteLabirynthPromptEasy();
+        return Results.Json(prompt);
+    }
+
+    public static async Task<IResult> RunLabirynthHard(ILabirynthController controller)
+    {
+        string prompt = await controller.WriteLabirynthPromptHard();
+        return Results.Json(prompt);
     }
 }
