@@ -6,11 +6,11 @@ public interface IHttpService
 {
     Task<string> GetString(Uri url);
 
-    Task<string> Post(Uri url, string request);
+    Task<string> Post(Uri url, string request, bool sendWithoutJsonHeader = false);
 
     Task<string> PostContent(Uri url, HttpContent content);
 
-    Task<T> PostJson<T>(Uri url, object request);
+    Task<T> PostJson<T>(Uri url, object request, bool sendWithoutJsonHeader = false);
 }
 
 public class HttpService(IJsonService jsonService) : IHttpService
@@ -29,16 +29,17 @@ public class HttpService(IJsonService jsonService) : IHttpService
         return await response.Content.ReadAsStringAsync();
     }
 
-    public async Task<string> Post(Uri url, string request)
+    public async Task<string> Post(Uri url, string request, bool sendWithoutJsonHeader = false)
     {
-        StringContent content = new(request, Encoding.UTF8, JsonHeader);
+        string header = sendWithoutJsonHeader ? string.Empty : JsonHeader;
+        StringContent content = new(request, Encoding.UTF8, header);
         return await PostContent(url, content);
     }
 
-    public async Task<T> PostJson<T>(Uri url, object request)
+    public async Task<T> PostJson<T>(Uri url, object request, bool sendWithoutJsonHeader = false)
     {
         string content = _jsonService.Serialize(request);
-        string response = await Post(url, content);
+        string response = await Post(url, content, sendWithoutJsonHeader);
         return _jsonService.Deserialize<T>(response);
     }
 }

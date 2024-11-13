@@ -10,7 +10,7 @@ public interface IFileCorrectionController
     Task<ResponseDto> RunFileCorrection();
 }
 
-public class FileCorrectionController(IConfiguration configuration, IHttpService httpService, IJsonService jsonService, ILogger<FileCorrectionController> logger) 
+public class FileCorrectionController(IConfiguration configuration, IHttpService httpService, IJsonService jsonService, ILogger<FileCorrectionController> logger)
     : IFileCorrectionController
 {
     private readonly IConfiguration _configuration = configuration;

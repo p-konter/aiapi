@@ -3,6 +3,7 @@ using AIWebApi._01_FillForm;
 using AIWebApi._02_Verify;
 using AIWebApi._03_FileCorrection;
 using AIWebApi._04_Labirynth;
+using AIWebApi._05_Censorship;
 
 namespace AIWebApi;
 
@@ -34,6 +35,10 @@ public static class ApiEndpoints
         app.MapGet("/writeHardLabirynthPrompt", ApiEndpoints.RunLabirynthHard)
             .Produces<string>()
             .WithDescription("Run through labirynth hard way - INCOMPLETE")
+            .WithTags("Api for AI_devs3");
+        app.MapGet("/censorFile", ApiEndpoints.RunCensorship)
+            .Produces<ResponseDto>()
+            .WithDescription("Censor text file")
             .WithTags("Api for AI_devs3");
 
         return app;
@@ -73,5 +78,11 @@ public static class ApiEndpoints
     {
         string prompt = await controller.WriteLabirynthPromptHard();
         return Results.Json(prompt);
+    }
+
+    public static async Task<IResult> RunCensorship(ICensorshipController controller)
+    {
+        await controller.RunCensorship();
+        return Results.Ok();
     }
 }
