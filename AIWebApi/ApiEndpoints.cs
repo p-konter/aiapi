@@ -35,11 +35,15 @@ public static class ApiEndpoints
         app.MapGet("/writeHardLabirynthPrompt", ApiEndpoints.RunLabirynthHard)
             .Produces<string>()
             .WithDescription("Run through labirynth hard way - INCOMPLETE")
-            .WithTags("Api for AI_devs3");
+            .WithTags("ToDo for AI_devs3");
         app.MapGet("/censorFile", ApiEndpoints.RunCensorship)
             .Produces<ResponseDto>()
             .WithDescription("Censor text file")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/censorFileLocal", ApiEndpoints.RunCensorshipWithLocalModel)
+            .Produces<ResponseDto>()
+            .WithDescription("Censor text file with local model - INCOMPLETE")
+            .WithTags("ToDo for AI_devs3");
 
         return app;
     }
@@ -82,7 +86,13 @@ public static class ApiEndpoints
 
     public static async Task<IResult> RunCensorship(ICensorshipController controller)
     {
-        await controller.RunCensorship();
-        return Results.Ok();
+        ResponseDto response = await controller.RunCensorship();
+        return Results.Json(response);
+    }
+
+    public static async Task<IResult> RunCensorshipWithLocalModel(ICensorshipController controller)
+    {
+        ResponseDto response = await controller.RunCensorshipLocal();
+        return Results.Json(response);
     }
 }

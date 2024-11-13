@@ -6,6 +6,8 @@ namespace AIWebApi._05_Censorship;
 public interface ICensorshipController
 {
     Task<ResponseDto> RunCensorship();
+
+    Task<ResponseDto> RunCensorshipLocal();
 }
 
 public class CensorshipController(IConfiguration configuration, IHttpService httpService, ILogger<CensorshipController> logger)
@@ -28,6 +30,19 @@ public class CensorshipController(IConfiguration configuration, IHttpService htt
         _logger.LogInformation("AI response: {response}", censored);
 
         ResponseDto response = await SendResponse(censored);
+        _logger.LogInformation("System response: {response}", response.Message);
+
+        return response;
+    }
+
+    public async Task<ResponseDto> RunCensorshipLocal()
+    {
+        string file = await GetFile();
+        _logger.LogInformation("File content: {file}", file);
+
+        // ToDo: use local model
+
+        ResponseDto response = await SendResponse(file);
         _logger.LogInformation("System response: {response}", response.Message);
 
         return response;
@@ -62,8 +77,8 @@ public class CensorshipController(IConfiguration configuration, IHttpService htt
 
         <rules>
         - You must write the text you receive. Do not add any other messages to it.
-        - You need to change name, street, city to the word "CENZURA"
-        - You need to change every number to the word "CENZURA"
+        - You need to change name, street, city and age to the word "CENZURA"
+        - You need to change age number to the word "CENZURA"
         - Write the text. Do not add anything else.
         </rules>
 
