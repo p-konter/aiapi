@@ -1,6 +1,5 @@
 ﻿using System.Data;
 
-using AIWebApi._00_PreWork;
 using AIWebApi.Core;
 
 namespace AIWebApi._03_FileCorrection;
@@ -10,14 +9,18 @@ public interface IFileCorrectionController
     Task<ResponseDto> RunFileCorrection();
 }
 
-public class FileCorrectionController(IConfiguration configuration, IHttpService httpService, IJsonService jsonService, ILogger<FileCorrectionController> logger)
-    : IFileCorrectionController
+public class FileCorrectionController(
+    IGPT4MiniAIService chatService,
+    IConfiguration configuration,
+    IHttpService httpService,
+    IJsonService jsonService,
+    ILogger<FileCorrectionController> logger) : IFileCorrectionController
 {
+    private readonly IGPT4MiniAIService _chatService = chatService;
     private readonly IConfiguration _configuration = configuration;
     private readonly IHttpService _httpService = httpService;
     private readonly IJsonService _jsonService = jsonService;
     private readonly ILogger<FileCorrectionController> _logger = logger;
-    private readonly OpenAIService _openAIService = new(ChatModel.GPT_40_Mini, configuration);
 
     private readonly string FilePath = "./ExternalData/FileCorrection.txt";
     private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
@@ -54,7 +57,7 @@ public class FileCorrectionController(IConfiguration configuration, IHttpService
     private async Task<string> AnswerQuestion(string question)
     {
         MessageDto questionMessage = new(Role.User, question);
-        MessageDto response = await _openAIService.ThreadChat([CreateSystemPrompt(), questionMessage]);
+        MessageDto response = await _chatService.ThreadChat([CreateSystemPrompt(), questionMessage]);
         _logger.LogInformation("FileCorrection question: {question}, response: {response}", questionMessage.Message, response.Message);
 
         return response.Message;

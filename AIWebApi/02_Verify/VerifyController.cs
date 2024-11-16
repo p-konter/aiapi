@@ -7,11 +7,11 @@ public interface IVerifyController
     Task<VerifyDto> RunVerify();
 }
 
-public class VerifyController(IConfiguration configuration, IHttpService httpService, ILogger<VerifyController> logger) : IVerifyController
+public class VerifyController(IGPT4MiniAIService chatService, IHttpService httpService, ILogger<VerifyController> logger) : IVerifyController
 {
+    private readonly IGPT4MiniAIService _chatService = chatService;
     private readonly ILogger<VerifyController> _logger = logger;
     private readonly IHttpService _httpService = httpService;
-    private readonly OpenAIService _service = new(ChatModel.GPT_40_Mini, configuration);
 
     private readonly Uri VerifyUrl = new("https://xyz.ag3nts.org/verify");
 
@@ -24,7 +24,7 @@ public class VerifyController(IConfiguration configuration, IHttpService httpSer
 
         do
         {
-            answer = await _service.ThreadChat([CreateSystemPrompt(), new MessageDto(Role.User, question.Text)]);
+            answer = await _chatService.ThreadChat([CreateSystemPrompt(), new MessageDto(Role.User, question.Text)]);
             _logger.LogInformation("Verify answer: {answer}", answer.Message);
 
             question = await _httpService.PostJson<VerifyDto>(VerifyUrl, new VerifyDto(answer.Message, question.MsgID));

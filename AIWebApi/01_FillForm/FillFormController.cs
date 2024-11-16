@@ -9,16 +9,16 @@ public interface IFillFormController
     Task<FillFormResponseDto> RunFillForm();
 }
 
-public class FillFormController(IConfiguration configuration, IHttpService httpService, ILogger<FillFormController> logger) : IFillFormController
+public class FillFormController(IGPT4AIService chatService, IHttpService httpService, ILogger<FillFormController> logger) : IFillFormController
 {
     public const string Username = "tester";
     public const string Password = "574e112a";
 
     public readonly Uri BaseUrl = new("http://xyz.ag3nts.org");
 
+    private readonly IGPT4AIService _chatService = chatService;
     private readonly IHttpService _httpService = httpService;
     private readonly ILogger<FillFormController> _logger = logger;
-    private readonly OpenAIService OpenAIService = new(ChatModel.GPT_40, configuration);
 
     public async Task<FillFormResponseDto> RunFillForm()
     {
@@ -59,7 +59,7 @@ public class FillFormController(IConfiguration configuration, IHttpService httpS
     private async Task<string> AskQuestion(string question)
     {
         string message = $"You are a historic expert. Answer this: {question} Write only year, without any additional text or formatting!";
-        return await OpenAIService.SimpleChat(message);
+        return await _chatService.SimpleChat(message);
     }
 
     private async Task<string> SendForm(string answer)

@@ -45,3 +45,5 @@ public class PreWorkController(IConfiguration configuration, IHttpService httpSe
         return answer;
     }
 }
+
+public record RequestDto(string Task, string Apikey, IList<string> Answer);

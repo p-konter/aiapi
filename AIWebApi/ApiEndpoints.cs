@@ -4,6 +4,8 @@ using AIWebApi._02_Verify;
 using AIWebApi._03_FileCorrection;
 using AIWebApi._04_Labirynth;
 using AIWebApi._05_Censorship;
+using AIWebApi._06_AudioReport;
+using AIWebApi.Core;
 
 namespace AIWebApi;
 
@@ -44,6 +46,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Censor text file with local model - INCOMPLETE")
             .WithTags("ToDo for AI_devs3");
+        app.MapGet("/audioReport", ApiEndpoints.RunAudioReport)
+            .Produces<ResponseDto>()
+            .WithDescription("Run report from audio files")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
@@ -93,6 +99,12 @@ public static class ApiEndpoints
     public static async Task<IResult> RunCensorshipWithLocalModel(ICensorshipController controller)
     {
         ResponseDto response = await controller.RunCensorshipLocal();
+        return Results.Json(response);
+    }
+
+    public static async Task<IResult> RunAudioReport(IAudioReportController controller)
+    {
+        ResponseDto response = await controller.RunAudioRepost();
         return Results.Json(response);
     }
 }

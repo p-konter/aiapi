@@ -1,5 +1,4 @@
-﻿using AIWebApi._00_PreWork;
-using AIWebApi.Core;
+﻿using AIWebApi.Core;
 
 namespace AIWebApi._05_Censorship;
 
@@ -10,12 +9,12 @@ public interface ICensorshipController
     Task<ResponseDto> RunCensorshipLocal();
 }
 
-public class CensorshipController(IConfiguration configuration, IHttpService httpService, ILogger<CensorshipController> logger)
+public class CensorshipController(IGPT4AIService chatService, IConfiguration configuration, IHttpService httpService, ILogger<CensorshipController> logger)
     : ICensorshipController
 {
+    private readonly IGPT4AIService _chatService = chatService;
     private readonly IHttpService _httpService = httpService;
     private readonly ILogger<CensorshipController> _logger = logger;
-    private readonly OpenAIService _openAIService = new(ChatModel.GPT_40, configuration);
 
     private const string FileUrl = "https://centrala.ag3nts.org/data/{key}/cenzura.txt";
     private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
@@ -57,7 +56,7 @@ public class CensorshipController(IConfiguration configuration, IHttpService htt
     private async Task<string> CensorText(string text)
     {
         MessageDto message = new(Role.User, text);
-        MessageDto response = await _openAIService.ThreadChat([CreateSystemPrompt(), message]);
+        MessageDto response = await _chatService.ThreadChat([CreateSystemPrompt(), message]);
 
         return response.Message;
     }
@@ -81,9 +80,6 @@ public class CensorshipController(IConfiguration configuration, IHttpService htt
         - You need to change age number to the word "CENZURA"
         - Write the text. Do not add anything else.
         </rules>
-
-        <example>
-        </example>
         """;
 
         return new MessageDto(Role.System, prompt);
