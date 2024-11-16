@@ -6,6 +6,7 @@ using AIWebApi._04_Labirynth;
 using AIWebApi._05_Censorship;
 using AIWebApi._06_AudioReport;
 using AIWebApi._07_RecognizeMap;
+using AIWebApi._08_GenerateRobot;
 using AIWebApi.Core;
 
 namespace AIWebApi;
@@ -55,6 +56,10 @@ public static class ApiEndpoints
             .Produces<string>()
             .WithDescription("Recognize cities on the map")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/generateRobot", ApiEndpoints.RunRobotGeneration)
+            .Produces<ResponseDto>()
+            .WithDescription("Generate robot image")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
@@ -69,6 +74,7 @@ public static class ApiEndpoints
     public static Task<IResult> RunCensorshipWithLocalModel(ICensorshipController controller) => ExecuteControllerMethod(c => c.RunCensorshipLocal(), controller);
     public static Task<IResult> RunAudioReport(IAudioReportController controller) => ExecuteControllerMethod(c => c.RunAudioRepost(), controller);
     public static Task<IResult> RunRecognizeMap(IRecognizeMapController controller) => ExecuteControllerMethod(c => c.RunRecognizeMap(), controller);
+    public static Task<IResult> RunRobotGeneration(IGenerateRobotController controller) => ExecuteControllerMethod(c => c.RunRobotGeneration(), controller);
 
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {

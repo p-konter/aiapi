@@ -7,6 +7,7 @@ using AIWebApi._04_Labirynth;
 using AIWebApi._05_Censorship;
 using AIWebApi._06_AudioReport;
 using AIWebApi._07_RecognizeMap;
+using AIWebApi._08_GenerateRobot;
 using AIWebApi.Core;
 
 using NLog.Web;
@@ -22,6 +23,7 @@ builder.WebHost.UseNLog();
 builder.Services.AddSingleton<IAudioAIService, AudioAIService>();
 builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
+builder.Services.AddSingleton<IImageAIService, ImageAIService>();
 builder.Services.AddSingleton<IJsonService, JsonService>();
 
 builder.Services.AddSingleton<IGPT4AIService>(sp =>
@@ -38,14 +40,15 @@ builder.Services.AddSingleton<IGPT4MiniAIService>(sp =>
 });
 
 // App controllers
-builder.Services.AddSingleton<IAudioReportController, AudioReportController>();
-builder.Services.AddSingleton<ICensorshipController, CensorshipController>();
-builder.Services.AddSingleton<IFileCorrectionController, FileCorrectionController>();
-builder.Services.AddSingleton<IFillFormController, FillFormController>();
-builder.Services.AddSingleton<ILabirynthController, LabirynthController>();
-builder.Services.AddSingleton<IPreWorkController, PreWorkController>();
-builder.Services.AddSingleton<IRecognizeMapController, RecognizeMapController>();
-builder.Services.AddSingleton<IVerifyController, VerifyController>();
+builder.Services.AddScoped<IAudioReportController, AudioReportController>();
+builder.Services.AddScoped<ICensorshipController, CensorshipController>();
+builder.Services.AddScoped<IFileCorrectionController, FileCorrectionController>();
+builder.Services.AddScoped<IFillFormController, FillFormController>();
+builder.Services.AddScoped<IGenerateRobotController, GenerateRobotController>();
+builder.Services.AddScoped<ILabirynthController, LabirynthController>();
+builder.Services.AddScoped<IPreWorkController, PreWorkController>();
+builder.Services.AddScoped<IRecognizeMapController, RecognizeMapController>();
+builder.Services.AddScoped<IVerifyController, VerifyController>();
 
 WebApplication app = builder.Build();
 

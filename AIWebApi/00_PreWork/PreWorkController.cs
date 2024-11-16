@@ -30,7 +30,7 @@ public class PreWorkController(IConfiguration configuration, IHttpService httpSe
     private async Task<ResponseDto> PostData(IList<string> values)
     {
         string apiKey = _configuration.GetStrictValue<string>(ApiKeyConfigName);
-        RequestDto request = new(TaskName, apiKey, values);
+        RequestListDto request = new(TaskName, apiKey, values);
         return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
     }
 
@@ -45,5 +45,3 @@ public class PreWorkController(IConfiguration configuration, IHttpService httpSe
         return answer;
     }
 }
-
-public record RequestDto(string Task, string Apikey, IList<string> Answer);

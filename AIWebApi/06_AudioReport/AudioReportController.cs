@@ -74,5 +74,3 @@ public class AudioReportController(IAudioAIService audioAIService, IGPT4AIServic
         return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
     }
 }
-
-public record RequestDto(string Task, string Apikey, string Answer);

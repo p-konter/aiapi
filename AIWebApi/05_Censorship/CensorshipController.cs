@@ -84,6 +84,4 @@ public class CensorshipController(IGPT4AIService chatService, IConfiguration con
 
         return new MessageDto(Role.System, prompt);
     }
-
-    public record RequestDto(string Task, string Apikey, string Answer);
 }
