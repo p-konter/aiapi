@@ -14,12 +14,12 @@ public class ChatAIService(string model, IConfiguration configuration, ILogger<C
         return completion.Content[0].Text;
     }
 
-    public async Task<MessageDto> ThreadChat(IList<MessageDto> messages)
+    public async Task<MessageDto> ThreadChat(IList<MessageDto> messages) => await ProcessChatAsync(messages.ToChatMessages());
+
+    private async Task<MessageDto> ProcessChatAsync(IList<ChatMessage> listMessages)
     {
-        IList<ChatMessage> listMessages = messages.ToChatMessages();
         ChatCompletion completion = await _client.CompleteChatAsync(listMessages);
         _logger.LogInformation("Chat completion: {completion}", completion.Content[0].Text);
-
         return new MessageDto(Role.Assistant, completion.Content[0].Text);
     }
 }

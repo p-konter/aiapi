@@ -22,7 +22,7 @@ public class FileCorrectionController(
     private readonly IJsonService _jsonService = jsonService;
     private readonly ILogger<FileCorrectionController> _logger = logger;
 
-    private readonly string FilePath = "./ExternalData/FileCorrection.txt";
+    private readonly string FilePath = "FileCorrection.txt";
     private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
 
     public async Task<ResponseDto> RunFileCorrection()

@@ -11,8 +11,9 @@ public interface IJsonService
     Task<T> LoadFromFile<T>(string filePath);
 }
 
-public class JsonService(ILogger<JsonService> logger) : IJsonService
+public class JsonService(IFileService fileService, ILogger<JsonService> logger) : IJsonService
 {
+    private readonly IFileService _fileService = fileService;
     private readonly ILogger<JsonService> _logger = logger;
 
     public string Serialize(object data)
@@ -42,19 +43,9 @@ public class JsonService(ILogger<JsonService> logger) : IJsonService
         }
     }
 
-    public async Task<T> LoadFromFile<T>(string filePath)
+    public async Task<T> LoadFromFile<T>(string fileName)
     {
-        if (string.IsNullOrEmpty(filePath))
-        {
-            throw new ArgumentException("File path cannot be null or empty", nameof(filePath));
-        }
-
-        if (!File.Exists(filePath))
-        {
-            throw new FileNotFoundException("File not found", filePath);
-        }
-
-        using FileStream fileStream = File.OpenRead(filePath);
+        FileStream fileStream = _fileService.ReadStream(fileName);
         T? result = await JsonSerializer.DeserializeAsync<T>(fileStream, GetJsonOptions());
         return result ?? throw new EmptyJsonException();
     }

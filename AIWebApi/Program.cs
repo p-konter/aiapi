@@ -6,6 +6,7 @@ using AIWebApi._03_FileCorrection;
 using AIWebApi._04_Labirynth;
 using AIWebApi._05_Censorship;
 using AIWebApi._06_AudioReport;
+using AIWebApi._07_RecognizeMap;
 using AIWebApi.Core;
 
 using NLog.Web;
@@ -19,6 +20,7 @@ builder.WebHost.UseNLog();
 
 // Core services
 builder.Services.AddSingleton<IAudioAIService, AudioAIService>();
+builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<IJsonService, JsonService>();
 
@@ -42,6 +44,7 @@ builder.Services.AddSingleton<IFileCorrectionController, FileCorrectionControlle
 builder.Services.AddSingleton<IFillFormController, FillFormController>();
 builder.Services.AddSingleton<ILabirynthController, LabirynthController>();
 builder.Services.AddSingleton<IPreWorkController, PreWorkController>();
+builder.Services.AddSingleton<IRecognizeMapController, RecognizeMapController>();
 builder.Services.AddSingleton<IVerifyController, VerifyController>();
 
 WebApplication app = builder.Build();

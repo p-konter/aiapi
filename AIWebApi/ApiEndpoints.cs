@@ -5,6 +5,7 @@ using AIWebApi._03_FileCorrection;
 using AIWebApi._04_Labirynth;
 using AIWebApi._05_Censorship;
 using AIWebApi._06_AudioReport;
+using AIWebApi._07_RecognizeMap;
 using AIWebApi.Core;
 
 namespace AIWebApi;
@@ -50,61 +51,28 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Run report from audio files")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/recognizeMap", ApiEndpoints.RunRecognizeMap)
+            .Produces<string>()
+            .WithDescription("Recognize cities on the map")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
 
-    public static async Task<IResult> PreWork(IPreWorkController controller)
-    {
-        ResponseDto response = await controller.RunPreWork();
-        return Results.Json(response);
-    }
+    public static Task<IResult> PreWork(IPreWorkController controller) => ExecuteControllerMethod(c => c.RunPreWork(), controller);
+    public static Task<IResult> FillForm(IFillFormController controller) => ExecuteControllerMethod(c => c.RunFillForm(), controller);
+    public static Task<IResult> Verify(IVerifyController controller) => ExecuteControllerMethod(c => c.RunVerify(), controller);
+    public static Task<IResult> CorrectFile(IFileCorrectionController controller) => ExecuteControllerMethod(c => c.RunFileCorrection(), controller);
+    public static Task<IResult> RunLabirynthEasy(ILabirynthController controller) => ExecuteControllerMethod(c => c.WriteLabirynthPromptEasy(), controller);
+    public static Task<IResult> RunLabirynthHard(ILabirynthController controller) => ExecuteControllerMethod(c => c.WriteLabirynthPromptHard(), controller);
+    public static Task<IResult> RunCensorship(ICensorshipController controller) => ExecuteControllerMethod(c => c.RunCensorship(), controller);
+    public static Task<IResult> RunCensorshipWithLocalModel(ICensorshipController controller) => ExecuteControllerMethod(c => c.RunCensorshipLocal(), controller);
+    public static Task<IResult> RunAudioReport(IAudioReportController controller) => ExecuteControllerMethod(c => c.RunAudioRepost(), controller);
+    public static Task<IResult> RunRecognizeMap(IRecognizeMapController controller) => ExecuteControllerMethod(c => c.RunRecognizeMap(), controller);
 
-    public static async Task<IResult> FillForm(IFillFormController controller)
+    private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {
-        FillFormResponseDto response = await controller.RunFillForm();
-        return Results.Json(response);
-    }
-
-    public static async Task<IResult> Verify(IVerifyController controller)
-    {
-        VerifyDto response = await controller.RunVerify();
-        return Results.Json(response);
-    }
-
-    public static async Task<IResult> CorrectFile(IFileCorrectionController controller)
-    {
-        ResponseDto response = await controller.RunFileCorrection();
-        return Results.Json(response);
-    }
-
-    public static async Task<IResult> RunLabirynthEasy(ILabirynthController controller)
-    {
-        string prompt = await controller.WriteLabirynthPromptEasy();
-        return Results.Json(prompt);
-    }
-
-    public static async Task<IResult> RunLabirynthHard(ILabirynthController controller)
-    {
-        string prompt = await controller.WriteLabirynthPromptHard();
-        return Results.Json(prompt);
-    }
-
-    public static async Task<IResult> RunCensorship(ICensorshipController controller)
-    {
-        ResponseDto response = await controller.RunCensorship();
-        return Results.Json(response);
-    }
-
-    public static async Task<IResult> RunCensorshipWithLocalModel(ICensorshipController controller)
-    {
-        ResponseDto response = await controller.RunCensorshipLocal();
-        return Results.Json(response);
-    }
-
-    public static async Task<IResult> RunAudioReport(IAudioReportController controller)
-    {
-        ResponseDto response = await controller.RunAudioRepost();
+        TResponse response = await method(controller);
         return Results.Json(response);
     }
 }
