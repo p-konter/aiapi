@@ -7,13 +7,14 @@ public interface IAudioReportController
     Task<ResponseDto> RunAudioRepost();
 }
 
-public class AudioReportController(IAudioAIService audioAIService, IGPT4AIService chatService, IConfiguration configuration, IHttpService httpService)
+public class AudioReportController(IAudioAIService audioAIService, IGPT4AIService chatService, IFileService fileService, IConfiguration configuration, IHttpService httpService)
     : IAudioReportController
 {
     private readonly List<string> FileNames = ["adam.m4a", "agnieszka.m4a", "ardian.m4a", "michal.m4a", "monika.m4a", "rafal.m4a"];
 
     private readonly IAudioAIService _audioAIService = audioAIService;
     private readonly IGPT4AIService _chatService = chatService;
+    private readonly IFileService _fileService = fileService;
     private readonly IHttpService _httpService = httpService;
 
     private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
@@ -33,10 +34,26 @@ public class AudioReportController(IAudioAIService audioAIService, IGPT4AIServic
         List<string> transcriptions = [];
         foreach (string FileName in FileNames)
         {
-            transcriptions.Add(await _audioAIService.AudioTranscription(FileName));
+            transcriptions.Add(await TranscriptFile(FileName));
         }
 
         return transcriptions;
+    }
+
+    private async Task<string> TranscriptFile(string fileName)
+    {
+        string textFileName = _fileService.ChangeExtension(fileName, ".txt");
+        string? textFile = await _fileService.ReadTextFile(textFileName);
+        if (textFile is not null)
+        {
+            return textFile;
+        }
+
+        string filePath = _fileService.CheckFileExists(fileName);
+        string transcription = await _audioAIService.AudioTranscription(filePath);
+
+        await _fileService.WriteTextFile(textFileName, transcription);
+        return transcription;
     }
 
     private async Task<string> FindStreet(IList<string> texts)

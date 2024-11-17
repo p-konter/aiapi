@@ -8,6 +8,7 @@ using AIWebApi._05_Censorship;
 using AIWebApi._06_AudioReport;
 using AIWebApi._07_RecognizeMap;
 using AIWebApi._08_GenerateRobot;
+using AIWebApi._09_SortFiles;
 using AIWebApi.Core;
 
 using NLog.Web;
@@ -25,6 +26,7 @@ builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<IImageAIService, ImageAIService>();
 builder.Services.AddSingleton<IJsonService, JsonService>();
+builder.Services.AddSingleton<IZipService, ZipService>();
 
 builder.Services.AddSingleton<IGPT4AIService>(sp =>
 {
@@ -48,6 +50,7 @@ builder.Services.AddScoped<IGenerateRobotController, GenerateRobotController>();
 builder.Services.AddScoped<ILabirynthController, LabirynthController>();
 builder.Services.AddScoped<IPreWorkController, PreWorkController>();
 builder.Services.AddScoped<IRecognizeMapController, RecognizeMapController>();
+builder.Services.AddScoped<ISortFilesController, SortFilesController>();
 builder.Services.AddScoped<IVerifyController, VerifyController>();
 
 WebApplication app = builder.Build();

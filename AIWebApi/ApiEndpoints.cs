@@ -7,6 +7,7 @@ using AIWebApi._05_Censorship;
 using AIWebApi._06_AudioReport;
 using AIWebApi._07_RecognizeMap;
 using AIWebApi._08_GenerateRobot;
+using AIWebApi._09_SortFiles;
 using AIWebApi.Core;
 
 namespace AIWebApi;
@@ -60,6 +61,14 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Generate robot image")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/sortFiles", ApiEndpoints.RunSortFiles)
+            .Produces<ResponseDto>()
+            .WithDescription("Sort data files")
+            .WithTags("Api for AI_devs3");
+        app.MapGet("/clearFiles", ApiEndpoints.ClearSortFiles)
+            .Produces<bool>()
+            .WithDescription("Clear data files")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
@@ -75,6 +84,8 @@ public static class ApiEndpoints
     public static Task<IResult> RunAudioReport(IAudioReportController controller) => ExecuteControllerMethod(c => c.RunAudioRepost(), controller);
     public static Task<IResult> RunRecognizeMap(IRecognizeMapController controller) => ExecuteControllerMethod(c => c.RunRecognizeMap(), controller);
     public static Task<IResult> RunRobotGeneration(IGenerateRobotController controller) => ExecuteControllerMethod(c => c.RunRobotGeneration(), controller);
+    public static Task<IResult> RunSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.RunSortFiles(), controller);
+    public static Task<IResult> ClearSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.ClearSortFiles(), controller);
 
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {

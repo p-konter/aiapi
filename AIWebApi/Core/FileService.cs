@@ -6,6 +6,8 @@ public interface IFileService
 
     string CheckFileExists(string fileName);
 
+    bool CheckDataFolderExists();
+
     Task<BinaryData> ReadBinaryFile(string fileName);
 
     Task<string?> ReadTextFile(string fileName);
@@ -13,13 +15,17 @@ public interface IFileService
     FileStream ReadStream(string fileName);
 
     Task WriteTextFile(string fileName, string content);
+
+    IEnumerable<string> GetFileNames();
+
+    string GetFileType(string fileName);
 }
 
 public class FileService : IFileService
 {
-    private const string DataFolder = "ExternalData";
+    protected virtual string DataFolder { get; } = "ExternalData";
 
-    private static string SetFilePath(string fileName)
+    private string SetFilePath(string fileName)
     {
         return string.IsNullOrEmpty(fileName)
             ? throw new ArgumentException("File path cannot be null or empty", nameof(fileName))
@@ -58,5 +64,17 @@ public class FileService : IFileService
         return !File.Exists(filePath) ? throw new FileNotFoundException("File not found", fileName) : filePath;
     }
 
+    public bool CheckDataFolderExists() => Directory.Exists(DataFolder);
+
     public string ChangeExtension(string fileName, string extension) => Path.ChangeExtension(fileName, extension);
+
+    public IEnumerable<string> GetFileNames()
+    {
+        foreach (string file in Directory.EnumerateFiles(DataFolder))
+        {
+            yield return Path.GetFileName(file);
+        }
+    }
+
+    public string GetFileType(string fileName) => Path.GetExtension(fileName).TrimStart('.').ToLower();
 }
