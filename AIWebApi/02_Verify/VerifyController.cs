@@ -24,7 +24,7 @@ public class VerifyController(IGPT4MiniAIService chatService, IHttpService httpS
 
         do
         {
-            answer = await _chatService.ThreadChat([CreateSystemPrompt(), new MessageDto(Role.User, question.Text)]);
+            answer = await _chatService.Chat([CreateSystemPrompt(), new MessageDto(Role.User, question.Text)]);
             _logger.LogInformation("Verify answer: {answer}", answer.Message);
 
             question = await _httpService.PostJson<VerifyDto>(VerifyUrl, new VerifyDto(answer.Message, question.MsgID));

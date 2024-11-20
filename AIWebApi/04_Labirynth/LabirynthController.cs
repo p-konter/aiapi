@@ -19,7 +19,7 @@ public class LabirynthController(IGPT4MiniAIService chatService, ILogger<Labiryn
         try
         {
             MessageDto messageDto = new(Role.User, Prompts.EasyPrompt);
-            MessageDto response = await _chatService.ThreadChat([messageDto]);
+            MessageDto response = await _chatService.Chat([messageDto]);
             _logger.LogInformation("Response message: {response}", response.Message);
             return response.Message;
         }
@@ -35,7 +35,7 @@ public class LabirynthController(IGPT4MiniAIService chatService, ILogger<Labiryn
         try
         {
             MessageDto messageDto = new(Role.User, Prompts.HardPrompt);
-            MessageDto response = await _chatService.ThreadChat([messageDto]);
+            MessageDto response = await _chatService.Chat([messageDto]);
             _logger.LogInformation("Response message: {response}", response.Message);
             return response.Message;
         }

@@ -4,7 +4,9 @@ public interface IChatAIService
 {
     Task<string> SimpleChat(string message);
 
-    Task<MessageDto> ThreadChat(IList<MessageDto> messages);
+    Task<MessageDto> Chat(IList<MessageDto> messages);
+
+    Task<MessageDto> ReadImageChat(string fileName, string prompt);
 }
 
 public interface IGPT4AIService : IChatAIService;

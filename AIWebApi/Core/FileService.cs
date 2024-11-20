@@ -1,7 +1,13 @@
-﻿namespace AIWebApi.Core;
+﻿using System.IO.Compression;
+
+namespace AIWebApi.Core;
 
 public interface IFileService
 {
+    void SetFolder(string path);
+
+    void SetFolder(IList<string> paths);
+
     string ChangeExtension(string fileName, string extension);
 
     string CheckFileExists(string fileName);
@@ -19,17 +25,25 @@ public interface IFileService
     IEnumerable<string> GetFileNames();
 
     string GetFileType(string fileName);
+
+    void ClearDataFolder();
+
+    void UnzipFile(string fileName, string unzipPath);
 }
 
 public class FileService : IFileService
 {
-    protected virtual string DataFolder { get; } = "ExternalData";
+    public string Folder { get; set; } = string.Empty;
+
+    public void SetFolder(string path) => Folder = path;
+
+    public void SetFolder(IList<string> paths) => Folder = string.Join(Path.DirectorySeparatorChar, paths);
 
     private string SetFilePath(string fileName)
     {
         return string.IsNullOrEmpty(fileName)
             ? throw new ArgumentException("File path cannot be null or empty", nameof(fileName))
-            : Path.Combine(DataFolder, fileName);
+            : Path.Combine(Folder, fileName);
     }
 
     public async Task<string?> ReadTextFile(string fileName)
@@ -64,17 +78,38 @@ public class FileService : IFileService
         return !File.Exists(filePath) ? throw new FileNotFoundException("File not found", fileName) : filePath;
     }
 
-    public bool CheckDataFolderExists() => Directory.Exists(DataFolder);
+    public bool CheckDataFolderExists() => Directory.Exists(Folder);
 
     public string ChangeExtension(string fileName, string extension) => Path.ChangeExtension(fileName, extension);
 
     public IEnumerable<string> GetFileNames()
     {
-        foreach (string file in Directory.EnumerateFiles(DataFolder))
+        foreach (string file in Directory.EnumerateFiles(Folder))
         {
             yield return Path.GetFileName(file);
         }
     }
 
     public string GetFileType(string fileName) => Path.GetExtension(fileName).TrimStart('.').ToLower();
+
+    public void UnzipFile(string fileName, string unzipPath)
+    {
+        string zipFilePath = SetFilePath(fileName);
+        ZipFile.ExtractToDirectory(zipFilePath, unzipPath);
+    }
+
+    public void ClearDataFolder()
+    {
+        DirectoryInfo directory = new(Folder);
+        foreach (FileInfo file in directory.GetFiles())
+        {
+            file.Delete();
+        }
+        foreach (DirectoryInfo dir in directory.GetDirectories())
+        {
+            dir.Delete(true);
+        }
+
+        directory.Delete();
+    }
 }

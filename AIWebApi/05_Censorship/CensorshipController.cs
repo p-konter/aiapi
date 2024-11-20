@@ -56,7 +56,7 @@ public class CensorshipController(IGPT4AIService chatService, IConfiguration con
     private async Task<string> CensorText(string text)
     {
         MessageDto message = new(Role.User, text);
-        MessageDto response = await _chatService.ThreadChat([CreateSystemPrompt(), message]);
+        MessageDto response = await _chatService.Chat([CreateSystemPrompt(), message]);
 
         return response.Message;
     }

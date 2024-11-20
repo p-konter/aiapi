@@ -2,7 +2,8 @@
 
 namespace AIWebApi.Core;
 
-public class ChatAIService(string model, IConfiguration configuration, ILogger<ChatAIService> logger) : IGPT4AIService, IGPT4MiniAIService
+public class ChatAIService(string model, IConfiguration configuration, IFileService fileService, ILogger<ChatAIService> logger) 
+    : BaseFileAIService(fileService), IGPT4AIService, IGPT4MiniAIService
 {
     private const string OpenAIApiKey = "OpenAIApiKey";
     private readonly ChatClient _client = new(model, configuration.GetStrictValue<string>(OpenAIApiKey));
@@ -14,7 +15,24 @@ public class ChatAIService(string model, IConfiguration configuration, ILogger<C
         return completion.Content[0].Text;
     }
 
-    public async Task<MessageDto> ThreadChat(IList<MessageDto> messages) => await ProcessChatAsync(messages.ToChatMessages());
+    public async Task<MessageDto> Chat(IList<MessageDto> messages) => await ProcessChatAsync(messages.ToChatMessages());
+
+    public async Task<MessageDto> ReadImageChat(string fileName, string prompt)
+    {
+        string? data = await LoadProcessedData(fileName);
+        if (data is not null)
+        {
+            return new MessageDto(Role.Assistant, data);
+        }
+
+        BinaryData file = await ReadBinaryFile(fileName);
+        List<MessageDto> messages = [new(Role.User, prompt, [new ImageDto(file, ImageType.Png)])];
+
+        MessageDto response = await ProcessChatAsync(messages.ToChatMessages());
+        await SaveProcessedData(fileName, response.Message);
+
+        return response;
+    }
 
     private async Task<MessageDto> ProcessChatAsync(IList<ChatMessage> listMessages)
     {

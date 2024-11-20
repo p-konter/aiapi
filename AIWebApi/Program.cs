@@ -22,23 +22,24 @@ builder.WebHost.UseNLog();
 
 // Core services
 builder.Services.AddSingleton<IAudioAIService, AudioAIService>();
-builder.Services.AddSingleton<IFileService, FileService>();
+builder.Services.AddScoped<IFileService, FileService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<IImageAIService, ImageAIService>();
 builder.Services.AddSingleton<IJsonService, JsonService>();
-builder.Services.AddSingleton<IZipService, ZipService>();
 
 builder.Services.AddSingleton<IGPT4AIService>(sp =>
 {
     IConfiguration configuration = sp.GetRequiredService<IConfiguration>();
+    IFileService fileService = sp.GetRequiredService<IFileService>();
     ILogger<ChatAIService> logger = sp.GetRequiredService<ILogger<ChatAIService>>();
-    return new ChatAIService("gpt-4o", configuration, logger);
+    return new ChatAIService("gpt-4o", configuration, fileService, logger);
 });
 builder.Services.AddSingleton<IGPT4MiniAIService>(sp =>
 {
     IConfiguration configuration = sp.GetRequiredService<IConfiguration>();
+    IFileService fileService = sp.GetRequiredService<IFileService>();
     ILogger<ChatAIService> logger = sp.GetRequiredService<ILogger<ChatAIService>>();
-    return new ChatAIService("gpt-4o-mini", configuration, logger);
+    return new ChatAIService("gpt-4o-mini", configuration, fileService, logger);
 });
 
 // App controllers

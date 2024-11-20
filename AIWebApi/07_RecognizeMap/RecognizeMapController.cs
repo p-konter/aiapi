@@ -9,13 +9,15 @@ public interface IRecognizeMapController
 
 public class RecognizeMapController(IFileService fileService, IGPT4AIService chatService) : IRecognizeMapController
 {
-    private readonly List<string> fileNames = ["map1.png", "map2.png", "map3.png", "map4.png"];
+    private readonly List<string> FileNames = ["map1.png", "map2.png", "map3.png", "map4.png"];
+    private readonly string DataPath = "ExternalData";
 
     private readonly IGPT4AIService _chatService = chatService;
     private readonly IFileService _fileService = fileService;
 
     public async Task<string> RunRecognizeMap()
     {
+        _fileService.SetFolder(DataPath);
         List<ImageDto> images = await LoadImages();
         return await Recognize(images);
     }
@@ -23,7 +25,7 @@ public class RecognizeMapController(IFileService fileService, IGPT4AIService cha
     private async Task<List<ImageDto>> LoadImages()
     {
         List<ImageDto> images = [];
-        foreach (string filename in fileNames)
+        foreach (string filename in FileNames)
         {
             BinaryData map = await _fileService.ReadBinaryFile(filename);
             images.Add(new ImageDto(map, ImageType.Png));
@@ -35,7 +37,7 @@ public class RecognizeMapController(IFileService fileService, IGPT4AIService cha
     {
         string prompt = "You have attached images of screenshots of a map of city in Poland. Three of them are maps of the same city. Recognize which city it is and write its name.";
         MessageDto message = new(Role.User, prompt, images);
-        MessageDto response = await _chatService.ThreadChat([message]);
+        MessageDto response = await _chatService.Chat([message]);
         return response.Message;
     }
 }

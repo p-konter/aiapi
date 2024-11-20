@@ -57,7 +57,7 @@ public class FileCorrectionController(
     private async Task<string> AnswerQuestion(string question)
     {
         MessageDto questionMessage = new(Role.User, question);
-        MessageDto response = await _chatService.ThreadChat([CreateSystemPrompt(), questionMessage]);
+        MessageDto response = await _chatService.Chat([CreateSystemPrompt(), questionMessage]);
         _logger.LogInformation("FileCorrection question: {question}, response: {response}", questionMessage.Message, response.Message);
 
         return response.Message;
