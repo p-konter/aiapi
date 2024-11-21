@@ -24,7 +24,7 @@ public class AudioAIService(IConfiguration configuration, IFileService fileServi
         {
             return data;
         }
-
+        _logger.LogInformation("Path: {text}", base._fileService.GetFolder());
         string filePath = ReturnFilePath(fileName);
         AudioTranscription transcription = await _client.TranscribeAudioAsync(filePath);
 

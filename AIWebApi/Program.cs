@@ -9,6 +9,7 @@ using AIWebApi._06_AudioReport;
 using AIWebApi._07_RecognizeMap;
 using AIWebApi._08_GenerateRobot;
 using AIWebApi._09_SortFiles;
+using AIWebApi._11_GenerateKeywords;
 using AIWebApi.Core;
 
 using NLog.Web;
@@ -22,7 +23,7 @@ builder.WebHost.UseNLog();
 
 // Core services
 builder.Services.AddSingleton<IAudioAIService, AudioAIService>();
-builder.Services.AddScoped<IFileService, FileService>();
+builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<IImageAIService, ImageAIService>();
 builder.Services.AddSingleton<IJsonService, JsonService>();
@@ -47,6 +48,7 @@ builder.Services.AddScoped<IAudioReportController, AudioReportController>();
 builder.Services.AddScoped<ICensorshipController, CensorshipController>();
 builder.Services.AddScoped<IFileCorrectionController, FileCorrectionController>();
 builder.Services.AddScoped<IFillFormController, FillFormController>();
+builder.Services.AddScoped<IGenerateKeywordsController, GenerateKeywordsController>();
 builder.Services.AddScoped<IGenerateRobotController, GenerateRobotController>();
 builder.Services.AddScoped<ILabirynthController, LabirynthController>();
 builder.Services.AddScoped<IPreWorkController, PreWorkController>();

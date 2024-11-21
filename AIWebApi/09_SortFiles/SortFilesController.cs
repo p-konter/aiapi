@@ -1,6 +1,4 @@
-﻿using System.ComponentModel;
-
-using AIWebApi.Core;
+﻿using AIWebApi.Core;
 
 namespace AIWebApi._09_SortFiles;
 
@@ -17,6 +15,7 @@ public class SortFilesController(
     IFileService fileService,
     IGPT4AIService chatService,
     IHttpService httpService,
+    IJsonService jsonService,
     ILogger<SortFilesController> logger) : ISortFilesController
 {
     private readonly string DataPath = "ExternalData";
@@ -29,6 +28,7 @@ public class SortFilesController(
     private readonly IFileService _fileService = fileService;
     private readonly IGPT4AIService _chatService = chatService;
     private readonly IHttpService _httpService = httpService;
+    private readonly IJsonService _jsonService = jsonService;
     private readonly ILogger<SortFilesController> _logger = logger;
 
     public async Task<ResponseDto> RunSortFiles()
@@ -55,10 +55,7 @@ public class SortFilesController(
     private void UnzipData()
     {
         _fileService.SetFolder(DataPath);
-        if (!_fileService.CheckDataFolderExists())
-        {
-            _fileService.UnzipFile(FileName, WorkPath);
-        }
+        _fileService.UnzipFileToFolder(FileName, WorkPath);
     }
 
     private async Task<List<FileDto>> ReadFiles()
@@ -75,7 +72,7 @@ public class SortFilesController(
                     description = await _fileService.ReadTextFile(file) ?? throw new Exception();
                     break;
                 case "mp3":
-                    description = await TranscriptAudioFile(file);
+                    description = await _audioAIService.AudioTranscription(file); ;
                     break;
                 case "png":
                     description = await RecognizeImage(file);
@@ -95,45 +92,17 @@ public class SortFilesController(
         return response.Message;
     }
 
-    private async Task<string> TranscriptAudioFile(string fileName)
-    {
-        string transcription = await _audioAIService.AudioTranscription(fileName);
-        return transcription;
-    }
-
     private async Task<FileTypeDto> GetInformation(FileDto file)
     {
-        string prompt = """
-        <objective>
-        You are an assistant. Your job is to sort information.
-        </objective>
-        
-        <rules>
-        - Read user message.
-        - *Thinkink*. Decide the message contains information about people, machines, or something else.
-        - Don't write people when the message contains pineapple pizza
-        - People have names and fingerprints.
-        - Abandoned cities have no people.
-        - Algorithms or AI or communication systems or QII or temperature scanners are not machines.
-        - Write one of three words: people, machines, others.
-        </rules>
-
-        <examples>
-        User: He only eats vegetarian food
-        Assistant: people
-
-        User: The screws are loose
-        Assistant: machines
-
-        User: Today is a sunny day
-        Assistant: others
-        </examples>
-        """;
+        string prompt = Prompts.SortFilesPrompt();
         List<MessageDto> messages = [new(Role.System, prompt), new(Role.User, file.Description)];
-        MessageDto response = await _chatService.Chat(messages);
+        MessageDto response = await _chatService.JsonChat(messages);
 
-        _logger.LogInformation("Categorization: {category} from file: {file} and message: {message}", response.Message, file.FileName, file.Description);
-        return new FileTypeDto(file.FileName, response.Message.Trim().ToLower().CreateByDescription<FileType>());
+        _logger.LogInformation("Categorization source: {file} and message: {message}", file.FileName, file.Description);
+        _logger.LogInformation("Categorization output: {output}", response.Message);
+        OutputMessageDto outputMessage = _jsonService.Deserialize<OutputMessageDto>(response.Message);
+
+        return new FileTypeDto(file.FileName, outputMessage.Category.CreateByDescription<FileType>());
     }
 
     private async Task<ResponseDto> SendResponse(List<FileTypeDto> files)
@@ -163,21 +132,3 @@ public class SortFilesController(
         return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
     }
 }
-
-public record FileDto(string FileName, string Description);
-
-public record FileTypeDto(string FileName, FileType Type);
-
-public record SortFilesDto(IList<string> People, IList<string> Hardware);
-
-public record SortFilesRequestDto(string Task, string Apikey, SortFilesDto Answer);
-
-public enum FileType
-{
-    [Description("people")]
-    People,
-    [Description("machines")]
-    Machines,
-    [Description("others")]
-    Others
-};

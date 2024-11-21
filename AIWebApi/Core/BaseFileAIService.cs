@@ -2,8 +2,8 @@
 
 public class BaseFileAIService(IFileService fileService)
 {
-    private readonly string TempDataExtension = ".log";
-    private readonly IFileService _fileService = fileService;
+    protected readonly string TempDataExtension = ".log";
+    protected readonly IFileService _fileService = fileService;
 
     public void SetFolder(string folder) => _fileService.SetFolder(folder);
 

@@ -6,6 +6,8 @@ public interface IChatAIService
 
     Task<MessageDto> Chat(IList<MessageDto> messages);
 
+    Task<MessageDto> JsonChat(IList<MessageDto> messages);
+
     Task<MessageDto> ReadImageChat(string fileName, string prompt);
 }
 

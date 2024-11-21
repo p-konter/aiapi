@@ -4,6 +4,8 @@ namespace AIWebApi.Core;
 
 public interface IFileService
 {
+    string GetFolder();
+
     void SetFolder(string path);
 
     void SetFolder(IList<string> paths);
@@ -11,8 +13,6 @@ public interface IFileService
     string ChangeExtension(string fileName, string extension);
 
     string CheckFileExists(string fileName);
-
-    bool CheckDataFolderExists();
 
     Task<BinaryData> ReadBinaryFile(string fileName);
 
@@ -28,12 +28,14 @@ public interface IFileService
 
     void ClearDataFolder();
 
-    void UnzipFile(string fileName, string unzipPath);
+    void UnzipFileToFolder(string fileName, string unzipPath);
 }
 
 public class FileService : IFileService
 {
     public string Folder { get; set; } = string.Empty;
+
+    public string GetFolder() => Folder;
 
     public void SetFolder(string path) => Folder = path;
 
@@ -78,8 +80,6 @@ public class FileService : IFileService
         return !File.Exists(filePath) ? throw new FileNotFoundException("File not found", fileName) : filePath;
     }
 
-    public bool CheckDataFolderExists() => Directory.Exists(Folder);
-
     public string ChangeExtension(string fileName, string extension) => Path.ChangeExtension(fileName, extension);
 
     public IEnumerable<string> GetFileNames()
@@ -92,10 +92,14 @@ public class FileService : IFileService
 
     public string GetFileType(string fileName) => Path.GetExtension(fileName).TrimStart('.').ToLower();
 
-    public void UnzipFile(string fileName, string unzipPath)
+    public void UnzipFileToFolder(string fileName, string unzipPath)
     {
-        string zipFilePath = SetFilePath(fileName);
-        ZipFile.ExtractToDirectory(zipFilePath, unzipPath);
+        string outputDirectory = Path.Combine(Folder, unzipPath);
+        if (!Directory.Exists(outputDirectory))
+        {
+            string zipFilePath = SetFilePath(fileName);
+            ZipFile.ExtractToDirectory(zipFilePath, outputDirectory);
+        }
     }
 
     public void ClearDataFolder()

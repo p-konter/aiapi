@@ -2,7 +2,7 @@
 
 namespace AIWebApi.Core;
 
-public class ChatAIService(string model, IConfiguration configuration, IFileService fileService, ILogger<ChatAIService> logger) 
+public class ChatAIService(string model, IConfiguration configuration, IFileService fileService, ILogger<ChatAIService> logger)
     : BaseFileAIService(fileService), IGPT4AIService, IGPT4MiniAIService
 {
     private const string OpenAIApiKey = "OpenAIApiKey";
@@ -16,6 +16,13 @@ public class ChatAIService(string model, IConfiguration configuration, IFileServ
     }
 
     public async Task<MessageDto> Chat(IList<MessageDto> messages) => await ProcessChatAsync(messages.ToChatMessages());
+
+    public async Task<MessageDto> JsonChat(IList<MessageDto> messages)
+    {
+        MessageDto dto = await ProcessChatAsync(messages.ToChatMessages());
+        dto.Message = dto.Message.Replace("```json", "").Replace("```", "").Trim();
+        return dto;
+    }
 
     public async Task<MessageDto> ReadImageChat(string fileName, string prompt)
     {

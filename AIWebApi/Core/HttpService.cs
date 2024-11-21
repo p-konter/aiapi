@@ -15,9 +15,10 @@ public interface IHttpService
     Task<T> PostJson<T>(Uri url, object request, bool sendWithoutJsonHeader = false);
 }
 
-public class HttpService(IJsonService jsonService) : IHttpService
+public class HttpService(IJsonService jsonService, ILogger<HttpService> logger) : IHttpService
 {
     private readonly IJsonService _jsonService = jsonService;
+    private readonly ILogger<HttpService> _logger = logger;
 
     private static readonly HttpClient _httpClient = new();
 
@@ -47,6 +48,7 @@ public class HttpService(IJsonService jsonService) : IHttpService
     public async Task<T> PostJson<T>(Uri url, object request, bool sendWithoutJsonHeader = false)
     {
         string content = _jsonService.Serialize(request);
+        _logger.LogInformation("Serialized content: {content}", content);
         string response = await Post(url, content, sendWithoutJsonHeader);
         return _jsonService.Deserialize<T>(response);
     }
