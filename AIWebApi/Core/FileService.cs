@@ -1,4 +1,4 @@
-﻿using System.IO.Compression;
+﻿using Aspose.Zip;
 
 namespace AIWebApi.Core;
 
@@ -26,9 +26,11 @@ public interface IFileService
 
     string GetFileType(string fileName);
 
+    string GetFileName(string fileName);
+
     void ClearDataFolder();
 
-    void UnzipFileToFolder(string fileName, string unzipPath);
+    void UnzipFileToFolder(string fileName, string unzipPath, string? password = null);
 }
 
 public class FileService : IFileService
@@ -92,13 +94,23 @@ public class FileService : IFileService
 
     public string GetFileType(string fileName) => Path.GetExtension(fileName).TrimStart('.').ToLower();
 
-    public void UnzipFileToFolder(string fileName, string unzipPath)
+    public string GetFileName(string fileName) => Path.GetFileNameWithoutExtension(fileName);
+
+    public void UnzipFileToFolder(string fileName, string unzipPath, string? password = null)
     {
         string outputDirectory = Path.Combine(Folder, unzipPath);
         if (!Directory.Exists(outputDirectory))
         {
             string zipFilePath = SetFilePath(fileName);
-            ZipFile.ExtractToDirectory(zipFilePath, outputDirectory);
+
+            ArchiveLoadOptions options = new();
+            if (password is not null)
+            {
+                options.DecryptionPassword = password;
+            }
+
+            using Archive archive = new(zipFilePath, options);
+            archive.ExtractToDirectory(outputDirectory);
         }
     }
 

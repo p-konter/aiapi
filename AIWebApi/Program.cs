@@ -10,6 +10,7 @@ using AIWebApi._07_RecognizeMap;
 using AIWebApi._08_GenerateRobot;
 using AIWebApi._09_SortFiles;
 using AIWebApi._11_GenerateKeywords;
+using AIWebApi._12_DateFromVector;
 using AIWebApi.Core;
 
 using NLog.Web;
@@ -23,6 +24,7 @@ builder.WebHost.UseNLog();
 
 // Core services
 builder.Services.AddSingleton<IAudioAIService, AudioAIService>();
+builder.Services.AddSingleton<IEmbeddingAIService, EmbeddingAIService>();
 builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<IImageAIService, ImageAIService>();
@@ -42,10 +44,12 @@ builder.Services.AddSingleton<IGPT4MiniAIService>(sp =>
     ILogger<ChatAIService> logger = sp.GetRequiredService<ILogger<ChatAIService>>();
     return new ChatAIService("gpt-4o-mini", configuration, fileService, logger);
 });
+builder.Services.AddSingleton<IQdrantService, QdrantService>();
 
 // App controllers
 builder.Services.AddScoped<IAudioReportController, AudioReportController>();
 builder.Services.AddScoped<ICensorshipController, CensorshipController>();
+builder.Services.AddScoped<IDateFromVectorController, DateFromVectorController>();
 builder.Services.AddScoped<IFileCorrectionController, FileCorrectionController>();
 builder.Services.AddScoped<IFillFormController, FillFormController>();
 builder.Services.AddScoped<IGenerateKeywordsController, GenerateKeywordsController>();

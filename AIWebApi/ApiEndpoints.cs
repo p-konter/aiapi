@@ -9,6 +9,7 @@ using AIWebApi._07_RecognizeMap;
 using AIWebApi._08_GenerateRobot;
 using AIWebApi._09_SortFiles;
 using AIWebApi._11_GenerateKeywords;
+using AIWebApi._12_DateFromVector;
 using AIWebApi.Core;
 
 namespace AIWebApi;
@@ -74,6 +75,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Generate kaywords to text files")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/getDateFromVector", ApiEndpoints.GetDateFromVector)
+            .Produces<ResponseDto>()
+            .WithDescription("Get date with vector data")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
@@ -92,6 +97,7 @@ public static class ApiEndpoints
     public static Task<IResult> RunSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.RunSortFiles(), controller);
     public static Task<IResult> ClearSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.ClearSortFiles(), controller);
     public static Task<IResult> RunGenerateKeywords(IGenerateKeywordsController controller) => ExecuteControllerMethod(c => c.RunGenerateKeywords(), controller);
+    public static Task<IResult> GetDateFromVector(IDateFromVectorController controller) => ExecuteControllerMethod(c => c.GetDateFromVector(), controller);
 
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {
