@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._11_GenerateKeywords;
+namespace AIWebApi.Tasks._11_GenerateKeywords;
 
 public interface IGenerateKeywordsController
 {

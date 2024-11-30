@@ -1,6 +1,6 @@
 ﻿using System.Text.Json.Serialization;
 
-namespace AIWebApi._03_FileCorrection;
+namespace AIWebApi.Tasks._03_FileCorrection;
 
 public class TestDataDto(string question, int answer, TestDto? test)
 {

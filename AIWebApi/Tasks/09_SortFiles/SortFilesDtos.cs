@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel;
 
-namespace AIWebApi._09_SortFiles;
+namespace AIWebApi.Tasks._09_SortFiles;
 
 public record OutputMessageDto(string Thinking, string Category);
 

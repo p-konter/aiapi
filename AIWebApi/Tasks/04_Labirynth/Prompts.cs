@@ -1,4 +1,4 @@
-﻿namespace AIWebApi._04_Labirynth;
+﻿namespace AIWebApi.Tasks._04_Labirynth;
 
 public static class Prompts
 {

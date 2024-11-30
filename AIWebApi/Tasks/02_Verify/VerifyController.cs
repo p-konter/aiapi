@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._02_Verify;
+namespace AIWebApi.Tasks._02_Verify;
 
 public interface IVerifyController
 {
@@ -49,5 +49,3 @@ public class VerifyController(IConfiguration configuration, IHttpService httpSer
         return new MessageDto(Role.System, prompt);
     }
 }
-
-public record VerifyDto(string Text, int MsgID);

@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._08_GenerateRobot;
+namespace AIWebApi.Tasks._08_GenerateRobot;
 
 public interface IGenerateRobotController
 {

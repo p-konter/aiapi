@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._06_AudioReport;
+namespace AIWebApi.Tasks._06_AudioReport;
 
 public interface IAudioReportController
 {

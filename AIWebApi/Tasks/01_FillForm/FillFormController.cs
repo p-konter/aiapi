@@ -2,7 +2,7 @@
 
 using HtmlAgilityPack;
 
-namespace AIWebApi._01_FillForm;
+namespace AIWebApi.Tasks._01_FillForm;
 
 public interface IFillFormController
 {
@@ -88,5 +88,3 @@ public class FillFormController(IConfiguration configuration, IHttpService httpS
         return node.InnerText;
     }
 }
-
-public record FillFormResponseDto(string Flag, string FileUrl);

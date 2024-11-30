@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._05_Censorship;
+namespace AIWebApi.Tasks._05_Censorship;
 
 public interface ICensorshipController
 {

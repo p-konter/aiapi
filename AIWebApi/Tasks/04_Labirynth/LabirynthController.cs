@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._04_Labirynth;
+namespace AIWebApi.Tasks._04_Labirynth;
 
 public interface ILabirynthController
 {

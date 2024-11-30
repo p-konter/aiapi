@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._00_PreWork;
+namespace AIWebApi.Tasks._00_PreWork;
 
 public interface IPreWorkController
 {

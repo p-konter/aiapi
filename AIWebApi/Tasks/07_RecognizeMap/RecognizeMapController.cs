@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._07_RecognizeMap;
+namespace AIWebApi.Tasks._07_RecognizeMap;
 
 public interface IRecognizeMapController
 {

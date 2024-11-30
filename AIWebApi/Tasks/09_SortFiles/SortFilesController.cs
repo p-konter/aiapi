@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._09_SortFiles;
+namespace AIWebApi.Tasks._09_SortFiles;
 
 public interface ISortFilesController
 {

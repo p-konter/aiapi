@@ -1,6 +1,6 @@
 ﻿using AIWebApi.Core;
 
-namespace AIWebApi._12_DateFromVector;
+namespace AIWebApi.Tasks._12_DateFromVector;
 
 public interface IDateFromVectorController
 {

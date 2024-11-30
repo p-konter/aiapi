@@ -2,7 +2,7 @@
 
 using AIWebApi.Core;
 
-namespace AIWebApi._03_FileCorrection;
+namespace AIWebApi.Tasks._03_FileCorrection;
 
 public interface IFileCorrectionController
 {
