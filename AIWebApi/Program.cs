@@ -29,6 +29,7 @@ builder.Services.AddSingleton<IFileService, FileService>();
 builder.Services.AddSingleton<IHttpService, HttpService>();
 builder.Services.AddSingleton<IImageAIService, ImageAIService>();
 builder.Services.AddSingleton<IJsonService, JsonService>();
+builder.Services.AddSingleton<IKernelService, KernelService>();
 
 builder.Services.AddSingleton<IGPT4AIService>(sp =>
 {

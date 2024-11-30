@@ -9,15 +9,15 @@ public interface IFillFormController
     Task<FillFormResponseDto> RunFillForm();
 }
 
-public class FillFormController(IGPT4AIService chatService, IHttpService httpService, ILogger<FillFormController> logger) : IFillFormController
+public class FillFormController(IConfiguration configuration, IHttpService httpService, IKernelService kernelService, ILogger<FillFormController> logger)
+    : IFillFormController
 {
     public const string Username = "tester";
     public const string Password = "574e112a";
 
-    public readonly Uri BaseUrl = new("http://xyz.ag3nts.org");
-
-    private readonly IGPT4AIService _chatService = chatService;
+    private readonly IConfiguration _configuration = configuration;
     private readonly IHttpService _httpService = httpService;
+    private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<FillFormController> _logger = logger;
 
     public async Task<FillFormResponseDto> RunFillForm()
@@ -47,9 +47,11 @@ public class FillFormController(IGPT4AIService chatService, IHttpService httpSer
         return document;
     }
 
+    private Uri GetUrl() => new(_configuration.GetSection("Urls").GetStrictValue<string>("XYZ"));
+
     private async Task<string> GetQuestion()
     {
-        string page = await _httpService.GetString(BaseUrl);
+        string page = await _httpService.GetString(GetUrl());
         HtmlDocument document = CreateHtmlDocument(page);
 
         HtmlNode node = document.DocumentNode.SelectSingleNode($"//*[@id='human-question']");
@@ -59,7 +61,7 @@ public class FillFormController(IGPT4AIService chatService, IHttpService httpSer
     private async Task<string> AskQuestion(string question)
     {
         string message = $"You are a historic expert. Answer this: {question} Write only year, without any additional text or formatting!";
-        return await _chatService.SimpleChat(message);
+        return await _kernelService.SimpleChat(AIModel.Gpt4oMini, message);
     }
 
     private async Task<string> SendForm(string answer)
@@ -72,7 +74,7 @@ public class FillFormController(IGPT4AIService chatService, IHttpService httpSer
         };
 
         FormUrlEncodedContent form = new(formData);
-        return await _httpService.PostContent(BaseUrl, form);
+        return await _httpService.PostContent(GetUrl(), form);
     }
 
     private Uri GetUrl(string form)
@@ -80,7 +82,7 @@ public class FillFormController(IGPT4AIService chatService, IHttpService httpSer
         HtmlDocument document = CreateHtmlDocument(form);
         HtmlNode link = document.DocumentNode.SelectSingleNode("//a");
         string href = link.GetAttributeValue("href", null);
-        return new Uri(BaseUrl, href);
+        return new Uri(GetUrl(), href);
     }
 
     private static string GetFlag(string form)
