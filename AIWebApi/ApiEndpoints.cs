@@ -35,11 +35,11 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Correct json file")
             .WithTags("Api for AI_devs3");
-        app.MapPost("/writeEasyLabirynthPrompt", ApiEndpoints.RunLabirynthEasy)
+        app.MapPost("/easyLabirynthPrompt", ApiEndpoints.RunLabirynthEasy)
             .Produces<string>()
             .WithDescription("Run through labirynth easy way")
             .WithTags("Api for AI_devs3");
-        app.MapGet("/writeHardLabirynthPrompt", ApiEndpoints.RunLabirynthHard)
+        app.MapGet("/hardLabirynthPrompt", ApiEndpoints.RunLabirynthHard)
             .Produces<string>()
             .WithDescription("Run through labirynth hard way - INCOMPLETE")
             .WithTags("ToDo for AI_devs3");

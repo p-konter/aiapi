@@ -1,5 +1,7 @@
 ﻿using System.ComponentModel;
 
+using Microsoft.SemanticKernel.ChatCompletion;
+
 using OpenAI.Chat;
 
 namespace AIWebApi.Core;
@@ -8,7 +10,8 @@ public enum Role
 {
     User,
     Assistant,
-    System
+    System,
+    Tool
 }
 
 public enum ImageType
@@ -31,6 +34,36 @@ public class MessageDto(Role role, string message, List<ImageDto>? images = null
     public string Message { get; set; } = message;
     public List<ImageDto>? Images { get; set; } = images;
 
+    public virtual Microsoft.SemanticKernel.ChatMessageContent ToKernelMessage()
+    {
+        if (Images is not null)
+        {
+            ChatMessageContentItemCollection items = [new Microsoft.SemanticKernel.TextContent(Message)];
+            foreach (ImageDto image in Images)
+            {
+                items.Add(new Microsoft.SemanticKernel.ImageContent(image.BinaryData, image.ImageType.GetDescription()));
+            }
+
+            return Role switch
+            {
+                Role.User => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.User, items),
+                Role.Assistant => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.Assistant, items),
+                Role.System => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.System, items),
+                Role.Tool => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.Tool, items),
+                _ => throw new NotImplementedException(),
+            };
+        }
+
+        return Role switch
+        {
+            Role.User => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.User, Message),
+            Role.Assistant => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.Assistant, Message),
+            Role.System => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.System, Message),
+            Role.Tool => new Microsoft.SemanticKernel.ChatMessageContent(AuthorRole.Tool, Message),
+            _ => throw new NotImplementedException(),
+        };
+    }
+
     public virtual ChatMessage ToChatMessage()
     {
         List<ChatMessageContentPart> parts = [ChatMessageContentPart.CreateTextPart(Message)];
@@ -52,6 +85,13 @@ public class MessageDto(Role role, string message, List<ImageDto>? images = null
 
 public static class ListMessageExtensions
 {
+    public static IList<Microsoft.SemanticKernel.ChatMessageContent> ToKernelMessages(this IList<MessageDto> list)
+    {
+        List<Microsoft.SemanticKernel.ChatMessageContent> listMessages = [];
+        listMessages.AddRange(list.Select(m => m.ToKernelMessage()));
+        return listMessages;
+    }
+
     public static IList<ChatMessage> ToChatMessages(this IList<MessageDto> list)
     {
         List<ChatMessage> listMessages = [];

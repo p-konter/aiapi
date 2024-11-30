@@ -45,6 +45,7 @@ public class JsonService(IFileService fileService, ILogger<JsonService> logger) 
 
     public async Task<T> LoadFromFile<T>(string fileName)
     {
+        _fileService.SetFolder("ExternalData");
         FileStream fileStream = _fileService.ReadStream(fileName);
         T? result = await JsonSerializer.DeserializeAsync<T>(fileStream, GetJsonOptions());
         return result ?? throw new EmptyJsonException();

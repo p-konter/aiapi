@@ -7,27 +7,25 @@ public interface IVerifyController
     Task<VerifyDto> RunVerify();
 }
 
-public class VerifyController(IGPT4MiniAIService chatService, IHttpService httpService, ILogger<VerifyController> logger) : IVerifyController
+public class VerifyController(IConfiguration configuration, IHttpService httpService, IKernelService kernelService, ILogger<VerifyController> logger)
+    : BaseController(configuration, httpService), IVerifyController
 {
-    private readonly IGPT4MiniAIService _chatService = chatService;
+    private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<VerifyController> _logger = logger;
-    private readonly IHttpService _httpService = httpService;
-
-    private readonly Uri VerifyUrl = new("https://xyz.ag3nts.org/verify");
 
     public async Task<VerifyDto> RunVerify()
     {
         MessageDto answer;
 
-        VerifyDto question = await _httpService.PostJson<VerifyDto>(VerifyUrl, new VerifyDto("READY", 0));
+        VerifyDto question = await _httpService.PostJson<VerifyDto>(GetUrl("XyzVerify"), new VerifyDto("READY", 0));
         _logger.LogInformation("Verify question: {question}", question.Text);
 
         do
         {
-            answer = await _chatService.Chat([CreateSystemPrompt(), new MessageDto(Role.User, question.Text)]);
+            answer = await _kernelService.Chat(AIModel.Gpt4oMini, [CreateSystemPrompt(), new MessageDto(Role.User, question.Text)]);
             _logger.LogInformation("Verify answer: {answer}", answer.Message);
 
-            question = await _httpService.PostJson<VerifyDto>(VerifyUrl, new VerifyDto(answer.Message, question.MsgID));
+            question = await _httpService.PostJson<VerifyDto>(GetUrl("XyzVerify"), new VerifyDto(answer.Message, question.MsgID));
             _logger.LogInformation("Verify question: {question}", question.Text);
 
         } while (question.Text is not null && !question.Text.StartsWith("{{"));

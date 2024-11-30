@@ -7,10 +7,12 @@ public abstract class BaseController(IConfiguration configuration, IHttpService 
 
     private const string ApiKeyConfigName = "ApiKey";
 
+    protected Uri GetUrl(string key) => new(_configuration.GetSection("Urls").GetStrictValue<string>(key));
+
     protected async Task<ResponseDto> SendAnswer<T>(string taskName, string urlKey, T answer)
     {
         string apiKey = _configuration.GetStrictValue<string>(ApiKeyConfigName);
-        Uri sendAnswerUrl = new(_configuration.GetSection("Urls").GetStrictValue<string>(urlKey));
+        Uri sendAnswerUrl = GetUrl(urlKey);
 
         RequestDto<T> request = new(taskName, apiKey, answer);
         return await _httpService.PostJson<ResponseDto>(sendAnswerUrl, request);

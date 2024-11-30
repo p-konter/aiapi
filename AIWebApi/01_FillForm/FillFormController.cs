@@ -10,13 +10,11 @@ public interface IFillFormController
 }
 
 public class FillFormController(IConfiguration configuration, IHttpService httpService, IKernelService kernelService, ILogger<FillFormController> logger)
-    : IFillFormController
+    : BaseController(configuration, httpService), IFillFormController
 {
     public const string Username = "tester";
     public const string Password = "574e112a";
 
-    private readonly IConfiguration _configuration = configuration;
-    private readonly IHttpService _httpService = httpService;
     private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<FillFormController> _logger = logger;
 
@@ -31,7 +29,7 @@ public class FillFormController(IConfiguration configuration, IHttpService httpS
         string formAnswer = await SendForm(aiAnswer);
         _logger.LogInformation("Form answer is: {formAnswer}", formAnswer);
 
-        Uri filename = GetUrl(formAnswer);
+        Uri filename = GetFilename(formAnswer);
         _logger.LogInformation("Filename from page is: {filename}", filename.ToString());
 
         string flag = GetFlag(formAnswer);
@@ -47,11 +45,9 @@ public class FillFormController(IConfiguration configuration, IHttpService httpS
         return document;
     }
 
-    private Uri GetUrl() => new(_configuration.GetSection("Urls").GetStrictValue<string>("XYZ"));
-
     private async Task<string> GetQuestion()
     {
-        string page = await _httpService.GetString(GetUrl());
+        string page = await _httpService.GetString(GetUrl("XYZ"));
         HtmlDocument document = CreateHtmlDocument(page);
 
         HtmlNode node = document.DocumentNode.SelectSingleNode($"//*[@id='human-question']");
@@ -74,15 +70,15 @@ public class FillFormController(IConfiguration configuration, IHttpService httpS
         };
 
         FormUrlEncodedContent form = new(formData);
-        return await _httpService.PostContent(GetUrl(), form);
+        return await _httpService.PostContent(GetUrl("XYZ"), form);
     }
 
-    private Uri GetUrl(string form)
+    private Uri GetFilename(string form)
     {
         HtmlDocument document = CreateHtmlDocument(form);
         HtmlNode link = document.DocumentNode.SelectSingleNode("//a");
         string href = link.GetAttributeValue("href", null);
-        return new Uri(GetUrl(), href);
+        return new Uri(GetUrl("XYZ"), href);
     }
 
     private static string GetFlag(string form)

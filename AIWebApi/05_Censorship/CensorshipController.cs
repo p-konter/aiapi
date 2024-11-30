@@ -9,16 +9,11 @@ public interface ICensorshipController
     Task<ResponseDto> RunCensorshipLocal();
 }
 
-public class CensorshipController(IGPT4AIService chatService, IConfiguration configuration, IHttpService httpService, ILogger<CensorshipController> logger)
-    : ICensorshipController
+public class CensorshipController(IConfiguration configuration, IHttpService httpService, IKernelService kernelService, ILogger<CensorshipController> logger)
+    : BaseController(configuration, httpService), ICensorshipController
 {
-    private readonly IGPT4AIService _chatService = chatService;
-    private readonly IHttpService _httpService = httpService;
+    private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<CensorshipController> _logger = logger;
-
-    private const string FileUrl = "https://centrala.ag3nts.org/data/{key}/cenzura.txt";
-    private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
-    private readonly string ApiKey = configuration.GetStrictValue<string>("ApiKey");
 
     public async Task<ResponseDto> RunCensorship()
     {
@@ -28,7 +23,7 @@ public class CensorshipController(IGPT4AIService chatService, IConfiguration con
         string censored = await CensorText(file);
         _logger.LogInformation("AI response: {response}", censored);
 
-        ResponseDto response = await SendResponse(censored);
+        ResponseDto response = await SendAnswer("CENZURA", "Report", censored);
         _logger.LogInformation("System response: {response}", response.Message);
 
         return response;
@@ -41,7 +36,7 @@ public class CensorshipController(IGPT4AIService chatService, IConfiguration con
 
         // ToDo: use local model
 
-        ResponseDto response = await SendResponse(file);
+        ResponseDto response = await SendAnswer("CENZURA", "Report", file);
         _logger.LogInformation("System response: {response}", response.Message);
 
         return response;
@@ -49,22 +44,18 @@ public class CensorshipController(IGPT4AIService chatService, IConfiguration con
 
     private async Task<string> GetFile()
     {
-        Uri url = new($"{FileUrl.Replace("{key}", ApiKey)}");
+        string apiKey = _configuration.GetStrictValue<string>("ApiKey");
+        Uri fileUrl = GetUrl("Censorship");
+        Uri url = new($"{fileUrl.ToString().Replace("{key}", apiKey)}");
         return await _httpService.GetString(url);
     }
 
     private async Task<string> CensorText(string text)
     {
         MessageDto message = new(Role.User, text);
-        MessageDto response = await _chatService.Chat([CreateSystemPrompt(), message]);
+        MessageDto response = await _kernelService.Chat(AIModel.Gpt4o, [CreateSystemPrompt(), message]);
 
         return response.Message;
-    }
-
-    private async Task<ResponseDto> SendResponse(string text)
-    {
-        RequestDto request = new("CENZURA", ApiKey, text);
-        return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
     }
 
     private static MessageDto CreateSystemPrompt()

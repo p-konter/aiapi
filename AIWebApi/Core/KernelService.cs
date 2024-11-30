@@ -8,16 +8,25 @@ namespace AIWebApi.Core;
 
 public interface IKernelService
 {
+    void ClearHistory();
+
+    Task<MessageDto> Chat(AIModel model, IList<MessageDto> messages);
+
     Task<string> SimpleChat(AIModel model, string message);
 }
 
 public class KernelService : IKernelService
 {
+    private readonly ILogger<KernelService> _logger;
     private const string OpenAIApiKey = "OpenAIApiKey";
     private readonly Kernel _kernel;
 
-    public KernelService(IConfiguration configuration)
+    private readonly ChatHistory History = [];
+
+    public KernelService(IConfiguration configuration, ILogger<KernelService> logger)
     {
+        _logger = logger;
+
         string openAIApiKey = configuration.GetStrictValue<string>(OpenAIApiKey);
         IKernelBuilder builder = Kernel.CreateBuilder();
         builder.AddOpenAIChatCompletion(AIModel.Gpt4o.GetDescription(), openAIApiKey, serviceId: AIModel.Gpt4o.GetDescription());
@@ -40,6 +49,19 @@ public class KernelService : IKernelService
         ChatMessageContent result = await chatCompletionService.GetChatMessageContentAsync(message);
         return result.Content ?? string.Empty;
     }
+
+    public async Task<MessageDto> Chat(AIModel model, IList<MessageDto> messages)
+    {
+        History.AddRange(messages.ToKernelMessages());
+        IChatCompletionService chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>(model.GetDescription());
+
+        ChatMessageContent result = await chatCompletionService.GetChatMessageContentAsync(History);
+
+        _logger.LogInformation("Chat completion: {completion}", result.Content);
+        return new MessageDto(Role.Assistant, result.Content ?? string.Empty);
+    }
+
+    public void ClearHistory() => History.Clear();
 
     private static OpenAIPromptExecutionSettings KernelSettings()
     {

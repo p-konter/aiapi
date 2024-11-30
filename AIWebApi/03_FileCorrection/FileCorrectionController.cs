@@ -10,20 +10,17 @@ public interface IFileCorrectionController
 }
 
 public class FileCorrectionController(
-    IGPT4MiniAIService chatService,
     IConfiguration configuration,
     IHttpService httpService,
     IJsonService jsonService,
-    ILogger<FileCorrectionController> logger) : IFileCorrectionController
+    IKernelService kernelService,
+    ILogger<FileCorrectionController> logger) : BaseController(configuration, httpService), IFileCorrectionController
 {
-    private readonly IGPT4MiniAIService _chatService = chatService;
-    private readonly IConfiguration _configuration = configuration;
-    private readonly IHttpService _httpService = httpService;
     private readonly IJsonService _jsonService = jsonService;
+    private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<FileCorrectionController> _logger = logger;
 
     private readonly string FilePath = "FileCorrection.txt";
-    private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
 
     public async Task<ResponseDto> RunFileCorrection()
     {
@@ -45,19 +42,13 @@ public class FileCorrectionController(
             }
         }
 
-        return await PostAnswer(fileData);
-    }
-
-    private async Task<ResponseDto> PostAnswer(FileDto fileData)
-    {
-        AnswerDto answer = new("JSON", fileData.Apikey, fileData);
-        return await _httpService.PostJson<ResponseDto>(PostDataUrl, answer);
+        return await SendAnswer("JSON", "Report", fileData);
     }
 
     private async Task<string> AnswerQuestion(string question)
     {
         MessageDto questionMessage = new(Role.User, question);
-        MessageDto response = await _chatService.Chat([CreateSystemPrompt(), questionMessage]);
+        MessageDto response = await _kernelService.Chat(AIModel.Gpt4oMini, [CreateSystemPrompt(), questionMessage]);
         _logger.LogInformation("FileCorrection question: {question}, response: {response}", questionMessage.Message, response.Message);
 
         return response.Message;
