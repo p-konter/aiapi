@@ -17,7 +17,7 @@ namespace AIWebApi;
 public static class ApiHandlers
 {
     public static Task<IResult> ClearLogFiles(ICleanController controller) => ExecuteControllerMethod(c => c.ClearLogFiles(), controller);
-    public static Task<IResult> ClearSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.ClearSortFiles(), controller);
+    public static Task<IResult> ClearWorkDir(ICleanController controller) => ExecuteControllerMethod(c => c.ClearWorkDir(), controller);
     public static Task<IResult> PreWork(IPreWorkController controller) => ExecuteControllerMethod(c => c.RunPreWork(), controller);
     public static Task<IResult> FillForm(IFillFormController controller) => ExecuteControllerMethod(c => c.RunFillForm(), controller);
     public static Task<IResult> Verify(IVerifyController controller) => ExecuteControllerMethod(c => c.RunVerify(), controller);

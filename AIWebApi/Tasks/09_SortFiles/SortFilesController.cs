@@ -5,8 +5,6 @@ namespace AIWebApi.Tasks._09_SortFiles;
 public interface ISortFilesController
 {
     Task<ResponseDto> RunSortFiles();
-
-    Task<bool> ClearSortFiles();
 }
 
 public class SortFilesController(
@@ -43,13 +41,6 @@ public class SortFilesController(
         }
 
         return await SendResponse(fileTypes);
-    }
-
-    public Task<bool> ClearSortFiles()
-    {
-        _fileService.SetFolder([DataPath, WorkPath]);
-        _fileService.ClearDataFolder();
-        return Task.FromResult(true);
     }
 
     private void UnzipData()

@@ -9,12 +9,6 @@ public class ChatAIService(string model, IConfiguration configuration, IFileServ
     private readonly ChatClient _client = new(model, configuration.GetStrictValue<string>(OpenAIApiKey));
     private readonly ILogger<ChatAIService> _logger = logger;
 
-    public async Task<string> SimpleChat(string message)
-    {
-        ChatCompletion completion = await _client.CompleteChatAsync(message);
-        return completion.Content[0].Text;
-    }
-
     public async Task<MessageDto> Chat(IList<MessageDto> messages) => await ProcessChatAsync(messages.ToChatMessages());
 
     public async Task<MessageDto> JsonChat(IList<MessageDto> messages)

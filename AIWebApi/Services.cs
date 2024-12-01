@@ -7,10 +7,8 @@ public static class Services
     public static IServiceCollection AddCoreServices(this IServiceCollection services)
     {
         services.AddSingleton<IAudioAIService, AudioAIService>();
-        services.AddSingleton<IEmbeddingAIService, EmbeddingAIService>();
         services.AddSingleton<IFileService, FileService>();
         services.AddSingleton<IHttpService, HttpService>();
-        services.AddSingleton<IImageAIService, ImageAIService>();
         services.AddSingleton<IJsonService, JsonService>();
         services.AddSingleton<IKernelService, KernelService>();
 

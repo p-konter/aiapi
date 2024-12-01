@@ -5,6 +5,8 @@ namespace AIWebApi.Tasks;
 public interface ICleanController
 {
     Task<bool> ClearLogFiles();
+
+    Task<bool> ClearWorkDir();
 }
 
 public class CleanController(IFileService fileService) : ICleanController
@@ -12,6 +14,7 @@ public class CleanController(IFileService fileService) : ICleanController
     private readonly IFileService _fileService = fileService;
 
     private readonly string Path = "ExternalData";
+    private readonly string WorkPath = "WorkData";
 
     public Task<bool> ClearLogFiles()
     {
@@ -26,6 +29,13 @@ public class CleanController(IFileService fileService) : ICleanController
             }
         }
 
+        return Task.FromResult(true);
+    }
+
+    public Task<bool> ClearWorkDir()
+    {
+        _fileService.SetFolder([Path, WorkPath]);
+        _fileService.ClearDataFolder();
         return Task.FromResult(true);
     }
 }

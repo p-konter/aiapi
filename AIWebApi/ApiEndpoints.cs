@@ -11,7 +11,7 @@ public static class ApiEndpoints
             .Produces<bool>()
             .WithDescription("Clear work data files")
             .WithTags("Clean project api");
-        app.MapGet("/clearWorkDirectory", ApiHandlers.ClearSortFiles)
+        app.MapGet("/clearWorkDirectory", ApiHandlers.ClearWorkDir)
             .Produces<bool>()
             .WithDescription("Clear work directory")
             .WithTags("Clean project api");

@@ -9,21 +9,18 @@ public interface IDateFromVectorController
 
 public class DateFromVectorController(
     IConfiguration configuration,
-    IEmbeddingAIService embeddingAIService,
     IFileService fileService,
     IHttpService httpService,
+    IKernelService kernelService,
     ILogger<DateFromVectorController> logger,
-    IQdrantService qdrantService) : IDateFromVectorController
+    IQdrantService qdrantService) : BaseController(configuration, httpService), IDateFromVectorController
 {
-    private readonly IEmbeddingAIService _embeddingAIService = embeddingAIService;
     private readonly IFileService _fileService = fileService;
-    private readonly IHttpService _httpService = httpService;
+    private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<DateFromVectorController> _logger = logger;
     private readonly IQdrantService _qdrantService = qdrantService;
 
     private readonly string DataPath = "ExternalData";
-    private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
-    private readonly string ApiKey = configuration.GetStrictValue<string>("ApiKey");
 
     public async Task<ResponseDto> GetDateFromVector()
     {
@@ -34,7 +31,7 @@ public class DateFromVectorController(
         await AddDataToBase(data);
 
         FileMetaDataDto result = await SearchData();
-        return await SendResponse(result);
+        return await SendAnswer("wektory", "Report", result.Date);
     }
 
     private void UnzipData()
@@ -61,7 +58,7 @@ public class DateFromVectorController(
             string text = await _fileService.ReadTextFile(file) ?? throw new Exception();
             _logger.LogInformation("Read file: {file}", file);
 
-            float[] vectors = await _embeddingAIService.CreateVector(text);
+            float[] vectors = await _kernelService.CreateVector(text);
 
             string date = _fileService.GetFileName(file).Replace('_', '-');
             fileData.Add(new FileMetaDataDto(date, vectors, text));
@@ -83,19 +80,13 @@ public class DateFromVectorController(
 
     private async Task<FileMetaDataDto> SearchData()
     {
-        float[] question = await _embeddingAIService.CreateVector("W raporcie, z którego dnia znajduje się wzmianka o kradzieży prototypu broni?");
+        float[] question = await _kernelService.CreateVector("W raporcie, z którego dnia znajduje się wzmianka o kradzieży prototypu broni?");
         IList<SearchResultDto> results = await _qdrantService.SearchAsync(question);
 
         FileMetaDataDto response = results.Select(x => new FileMetaDataDto(x.Data["Date"], [x.Score], x.Data["Content"])).First();
         _logger.LogInformation("Search result: date: {date}, content: {content}", response.Date, response.Content);
 
         return response;
-    }
-
-    private async Task<ResponseDto> SendResponse(FileMetaDataDto data)
-    {
-        RequestDto request = new("wektory", ApiKey, data.Date);
-        return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
     }
 }
 

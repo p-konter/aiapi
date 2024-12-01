@@ -2,8 +2,6 @@
 
 public interface IChatAIService
 {
-    Task<string> SimpleChat(string message);
-
     Task<MessageDto> Chat(IList<MessageDto> messages);
 
     Task<MessageDto> JsonChat(IList<MessageDto> messages);
