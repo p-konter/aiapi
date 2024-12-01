@@ -8,25 +8,20 @@ public interface ISortFilesController
 }
 
 public class SortFilesController(
-    IAudioAIService audioAIService,
     IConfiguration configuration,
     IFileService fileService,
-    IGPT4AIService chatService,
     IHttpService httpService,
     IJsonService jsonService,
-    ILogger<SortFilesController> logger) : ISortFilesController
+    IKernelService kernelService,
+    ILogger<SortFilesController> logger) : BaseController(configuration, httpService), ISortFilesController
 {
     private readonly string DataPath = "ExternalData";
     private readonly string WorkPath = "WorkData";
     public const string FileName = "pliki_z_fabryki.zip";
-    private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
-    private readonly string ApiKey = configuration.GetStrictValue<string>("ApiKey");
 
-    private readonly IAudioAIService _audioAIService = audioAIService;
     private readonly IFileService _fileService = fileService;
-    private readonly IGPT4AIService _chatService = chatService;
-    private readonly IHttpService _httpService = httpService;
     private readonly IJsonService _jsonService = jsonService;
+    private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<SortFilesController> _logger = logger;
 
     public async Task<ResponseDto> RunSortFiles()
@@ -40,7 +35,8 @@ public class SortFilesController(
             fileTypes.Add(await GetInformation(file));
         }
 
-        return await SendResponse(fileTypes);
+        SortFilesDto answer = PrepareAnswer(fileTypes);
+        return await SendAnswer("kategorie", "Report", answer);
     }
 
     private void UnzipData()
@@ -63,7 +59,7 @@ public class SortFilesController(
                     description = await _fileService.ReadTextFile(file) ?? throw new Exception();
                     break;
                 case "mp3":
-                    description = await _audioAIService.AudioTranscription(file); ;
+                    description = await _kernelService.AudioTranscription(file); ;
                     break;
                 case "png":
                     description = await RecognizeImage(file);
@@ -79,7 +75,7 @@ public class SortFilesController(
     private async Task<string> RecognizeImage(string fileName)
     {
         string prompt = "Read and write text from image.";
-        MessageDto response = await _chatService.ReadImageChat(fileName, prompt);
+        MessageDto response = await _kernelService.ImageChat(AIModel.Gpt4o, fileName, prompt);
         return response.Message;
     }
 
@@ -87,7 +83,8 @@ public class SortFilesController(
     {
         string prompt = Prompts.SortFilesPrompt();
         List<MessageDto> messages = [new(Role.System, prompt), new(Role.User, file.Description)];
-        MessageDto response = await _chatService.JsonChat(messages);
+        MessageDto response = await _kernelService.Chat(AIModel.Gpt4o, messages, returnJson: true);
+        _kernelService.ClearHistory();
 
         _logger.LogInformation("Categorization source: {file} and message: {message}", file.FileName, file.Description);
         _logger.LogInformation("Categorization output: {output}", response.Message);
@@ -96,7 +93,7 @@ public class SortFilesController(
         return new FileTypeDto(file.FileName, outputMessage.Category.CreateByDescription<FileType>());
     }
 
-    private async Task<ResponseDto> SendResponse(List<FileTypeDto> files)
+    private SortFilesDto PrepareAnswer(List<FileTypeDto> files)
     {
         List<string> people = [];
         List<string> hardware = [];
@@ -119,7 +116,6 @@ public class SortFilesController(
         _logger.LogInformation("People files: {peopleFiles}", string.Join(", ", people));
         _logger.LogInformation("Hardware files: {hardwareFiles}", string.Join(", ", hardware));
 
-        SortFilesRequestDto request = new("kategorie", ApiKey, new SortFilesDto(people, hardware));
-        return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
+        return new SortFilesDto(people, hardware);
     }
 }

@@ -61,12 +61,12 @@ public static class ApiEndpoints
             .WithTags("Api for AI_devs3");
         app.MapGet("/sortFiles", ApiHandlers.RunSortFiles)
             .Produces<ResponseDto>()
-            .WithDescription("Sort data files")
-            .WithTags("Api for AI_devs3");
+            .WithDescription("Sort data files; ToDo: reduce wrong answers, less randomness")
+            .WithTags("ToDo for AI_devs3");
         app.MapGet("/generateKeywords", ApiHandlers.RunGenerateKeywords)
             .Produces<ResponseDto>()
-            .WithDescription("Generate kaywords to text files")
-            .WithTags("Api for AI_devs3");
+            .WithDescription("Generate kaywords to text files; ToDo: reduce wrong answers, less randomness")
+            .WithTags("ToDo for AI_devs3");
         app.MapGet("/getDateFromVector", ApiHandlers.GetDateFromVector)
             .Produces<ResponseDto>()
             .WithDescription("Get date with vector data")

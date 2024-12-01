@@ -10,18 +10,15 @@ public interface IGenerateKeywordsController
 public class GenerateKeywordsController(
     IConfiguration configuration,
     IFileService fileService,
-    IGPT4AIService chatService,
-    IGPT4MiniAIService miniChatService,
     IHttpService httpService,
     IJsonService jsonService,
+    IKernelService kernelService,
     ILogger<GenerateKeywordsController> logger)
-    : IGenerateKeywordsController
+    : BaseController(configuration, httpService), IGenerateKeywordsController
 {
-    private readonly IGPT4AIService _chatService = chatService;
-    private readonly IGPT4MiniAIService _miniChatService = miniChatService;
     private readonly IFileService _fileService = fileService;
-    private readonly IHttpService _httpService = httpService;
     private readonly IJsonService _jsonService = jsonService;
+    private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<GenerateKeywordsController> _logger = logger;
 
     private readonly string DataPath = "ExternalData";
@@ -29,15 +26,14 @@ public class GenerateKeywordsController(
     private readonly string WorkPath = "WorkData";
     public const string FileName = "pliki_z_fabryki.zip";
 
-    private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
-    private readonly string ApiKey = configuration.GetStrictValue<string>("ApiKey");
-
     public async Task<ResponseDto> RunGenerateKeywords()
     {
         UnzipData();
         List<FactsDto> facts = await GetFactsData();
         List<FileDto> files = await ReadFiles(facts);
-        return await SendResponse(files);
+        Dictionary<string, string> answer = PrepareAnswer(files);
+
+        return await SendAnswer("dokumenty", "Report", answer);
     }
 
     private void UnzipData()
@@ -77,8 +73,8 @@ public class GenerateKeywordsController(
             }
             </output_format>
             """;
-            string user = $"<document>\n{text}\n</document>";
-            MessageDto response = await _chatService.JsonChat([new(Role.System, system), new(Role.User, user)]);
+            MessageDto response = await _kernelService.ProcessTextFile(AIModel.Gpt4o, file, [new(Role.System, system)], returnJson: true);
+            _kernelService.ClearHistory();
             _logger.LogInformation("Facts summary: file: {file}, message: {message}", file, response.Message);
             FactsDto factsDto = _jsonService.Deserialize<FactsDto>(response.Message);
             factsData.Add(factsDto);
@@ -100,7 +96,8 @@ public class GenerateKeywordsController(
         </rules>
         """;
         MessageDto request = new(Role.User, $"{prompt}\n<document>\n{document}\n</document>");
-        MessageDto response = await _miniChatService.Chat([request]);
+        MessageDto response = await _kernelService.Chat(AIModel.Gpt4oMini, [request]);
+        _kernelService.ClearHistory();
         return response.Message != "No" ? response.Message : null;
     }
 
@@ -128,7 +125,7 @@ public class GenerateKeywordsController(
 
             string prompt = """
             <objective>
-            You are an assistant copy editor. List keywords from the uploaded document. Add facts from the context.
+            You are an assistant copy editor. List keywords from the uploaded document.
             </objective>
 
             <rules>
@@ -137,7 +134,6 @@ public class GenerateKeywordsController(
             - Print a list of words separated by commas
             - Don't write anything more
             - Filename is important, extract and write sector
-            - Add keywords from the context
             </rules>
 
             <output_example>
@@ -145,7 +141,9 @@ public class GenerateKeywordsController(
             </output_example>
             """;
             string user = $"{prompt}\n{context}\n<filename>\n{file}\n</filename>\n\n<document>\n{text}\n</document>";
-            MessageDto response = await _chatService.Chat([new(Role.User, user)]);
+            MessageDto response = await _kernelService.Chat(AIModel.Gpt4o, [new(Role.User, user)]);
+            _kernelService.ClearHistory();
+
             _logger.LogInformation("File keywords: file: {file}, message: {message}", file, response.Message);
 
             fileData.Add(new(file, response.Message.Split(",")));
@@ -153,7 +151,7 @@ public class GenerateKeywordsController(
         return fileData;
     }
 
-    private async Task<ResponseDto> SendResponse(List<FileDto> files)
+    private static Dictionary<string, string> PrepareAnswer(List<FileDto> files)
     {
         Dictionary<string, string> answer = [];
         foreach (FileDto file in files)
@@ -161,8 +159,7 @@ public class GenerateKeywordsController(
             answer.Add(file.FileName, string.Join(",", file.Keywords.Select(k => k.Trim())));
         }
 
-        GenerateKeywordsRequestDto request = new("dokumenty", ApiKey, answer);
-        return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
+        return answer;
     }
 }
 

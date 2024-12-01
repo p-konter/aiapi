@@ -14,11 +14,13 @@ public interface IKernelService
 {
     void ClearHistory();
 
-    Task<MessageDto> Chat(AIModel model, IList<MessageDto> messages);
+    Task<MessageDto> Chat(AIModel model, IList<MessageDto> messages, bool returnJson = false);
 
     Task<string> SimpleChat(AIModel model, string message);
 
     Task<MessageDto> ImageChat(AIModel model, string fileName, string prompt);
+
+    Task<MessageDto> ProcessTextFile(AIModel model, string fileName, IList<MessageDto> messages, bool returnJson = false);
 
     Task<string> AudioTranscription(string fileName);
 
@@ -53,7 +55,7 @@ public class KernelService : IKernelService
         builder.AddOpenAITextToImage(openAIApiKey, serviceId: AIModel.DallE3.GetDescription());
         builder.AddOpenAITextEmbeddingGeneration(AIModel.TextEmbedding3Small.GetDescription(), openAIApiKey, serviceId: AIModel.TextEmbedding3Small.GetDescription());
 
-        builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Trace));
+        builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Information));
         _kernel = builder.Build();
 
         // Add plugins
@@ -67,15 +69,39 @@ public class KernelService : IKernelService
         return result.Content ?? string.Empty;
     }
 
-    public async Task<MessageDto> Chat(AIModel model, IList<MessageDto> messages)
+    public async Task<MessageDto> Chat(AIModel model, IList<MessageDto> messages, bool returnJson = false)
     {
         History.AddRange(messages.ToKernelMessages());
 
-        IChatCompletionService chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>(model.GetDescription());
-        ChatMessageContent result = await chatCompletionService.GetChatMessageContentAsync(History);
+        OpenAIPromptExecutionSettings executionSettings = new()
+        {
+            ResponseFormat = returnJson ? "json_object" : "text"
+        };
 
-        _logger.LogInformation("Chat completion: {completion}", result.Content);
-        return new MessageDto(Role.Assistant, result.Content ?? string.Empty);
+        IChatCompletionService chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>(model.GetDescription());
+        ChatMessageContent result = await chatCompletionService.GetChatMessageContentAsync(History, executionSettings);
+
+        string response = (result.Content != null) ? result.Content.Replace("```json", "").Replace("```", "").Trim() : string.Empty;
+        _logger.LogInformation("Chat completion: {completion}", response);
+
+        return new MessageDto(Role.Assistant, response);
+    }
+
+    public async Task<MessageDto> ProcessTextFile(AIModel model, string fileName, IList<MessageDto> messages, bool returnJson = false)
+    {
+        string? data = await LoadProcessedData(fileName);
+        if (data is not null)
+        {
+            return new MessageDto(Role.Assistant, data);
+        }
+
+        string text = await _fileService.ReadTextFile(fileName) ?? throw new Exception();
+        messages.Add(new(Role.User, text));
+
+        MessageDto response = await Chat(model, messages, returnJson);
+        await SaveProcessedData(fileName, response.Message);
+
+        return response;
     }
 
     public async Task<MessageDto> ImageChat(AIModel model, string fileName, string prompt)
@@ -169,15 +195,6 @@ public class KernelService : IKernelService
             await _fileService.WriteTextFile(textFileName, content);
         }
     }
-
-    //private static OpenAIPromptExecutionSettings KernelSettings()
-    //{
-    //    return new()
-    //    {
-    //        FunctionChoiceBehavior = FunctionChoiceBehavior.Auto(),
-    //        ToolCallBehavior = ToolCallBehavior.AutoInvokeKernelFunctions
-    //    };
-    //}
 }
 
 public enum AIModel
