@@ -7,21 +7,13 @@ public interface IAudioReportController
     Task<ResponseDto> RunAudioRepost();
 }
 
-public class AudioReportController(
-    IAudioAIService audioAIService,
-    IGPT4AIService chatService,
-    IConfiguration configuration,
-    IHttpService httpService) : IAudioReportController
+public class AudioReportController(IConfiguration configuration, IFileService fileService, IHttpService httpService, IKernelService kernelService)
+    : BaseController(configuration, httpService), IAudioReportController
 {
-    private readonly string AudioPath = "ExternalData";
-    private readonly List<string> FileNames = ["adam.m4a", "agnieszka.m4a", "ardian.m4a", "michal.m4a", "monika.m4a", "rafal.m4a"];
+    private readonly string Path = "ExternalData";
 
-    private readonly IAudioAIService _audioAIService = audioAIService;
-    private readonly IGPT4AIService _chatService = chatService;
-    private readonly IHttpService _httpService = httpService;
-
-    private readonly Uri PostDataUrl = new("https://centrala.ag3nts.org/report");
-    private readonly string ApiKey = configuration.GetStrictValue<string>("ApiKey");
+    private readonly IFileService _fileService = fileService;
+    private readonly IKernelService _kernelService = kernelService;
 
     public async Task<ResponseDto> RunAudioRepost()
     {
@@ -29,16 +21,21 @@ public class AudioReportController(
 
         string street = await FindStreet(transcriptions);
 
-        return await PostData(street);
+        return await SendAnswer("MP3", "Report", street);
     }
 
     private async Task<IList<string>> TranscriptFiles()
     {
-        _audioAIService.SetFolder(AudioPath);
+        _fileService.SetFolder(Path);
+        IEnumerable<string> files = _fileService.GetFileNames();
+
         List<string> transcriptions = [];
-        foreach (string fileName in FileNames)
+        foreach (string file in files)
         {
-            transcriptions.Add(await _audioAIService.AudioTranscription(fileName));
+            if (_fileService.GetFileType(file) == "m4a")
+            {
+                transcriptions.Add(await _kernelService.AudioTranscription(file));
+            }
         }
 
         return transcriptions;
@@ -52,7 +49,7 @@ public class AudioReportController(
             messages.Add(new MessageDto(Role.User, text));
         }
 
-        MessageDto response = await _chatService.Chat(messages);
+        MessageDto response = await _kernelService.Chat(AIModel.Gpt4o, messages);
         return response.Message;
     }
 
@@ -71,11 +68,5 @@ public class AudioReportController(
         </rules>    
         """;
         return new MessageDto(Role.System, prompt);
-    }
-
-    private async Task<ResponseDto> PostData(string value)
-    {
-        RequestDto request = new("MP3", ApiKey, value);
-        return await _httpService.PostJson<ResponseDto>(PostDataUrl, request);
     }
 }

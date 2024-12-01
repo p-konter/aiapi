@@ -1,3 +1,4 @@
+using AIWebApi.Tasks;
 using AIWebApi.Tasks._00_PreWork;
 using AIWebApi.Tasks._01_FillForm;
 using AIWebApi.Tasks._02_Verify;
@@ -15,6 +16,8 @@ namespace AIWebApi;
 
 public static class ApiHandlers
 {
+    public static Task<IResult> ClearLogFiles(ICleanController controller) => ExecuteControllerMethod(c => c.ClearLogFiles(), controller);
+    public static Task<IResult> ClearSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.ClearSortFiles(), controller);
     public static Task<IResult> PreWork(IPreWorkController controller) => ExecuteControllerMethod(c => c.RunPreWork(), controller);
     public static Task<IResult> FillForm(IFillFormController controller) => ExecuteControllerMethod(c => c.RunFillForm(), controller);
     public static Task<IResult> Verify(IVerifyController controller) => ExecuteControllerMethod(c => c.RunVerify(), controller);
@@ -27,7 +30,6 @@ public static class ApiHandlers
     public static Task<IResult> RunRecognizeMap(IRecognizeMapController controller) => ExecuteControllerMethod(c => c.RunRecognizeMap(), controller);
     public static Task<IResult> RunRobotGeneration(IGenerateRobotController controller) => ExecuteControllerMethod(c => c.RunRobotGeneration(), controller);
     public static Task<IResult> RunSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.RunSortFiles(), controller);
-    public static Task<IResult> ClearSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.ClearSortFiles(), controller);
     public static Task<IResult> RunGenerateKeywords(IGenerateKeywordsController controller) => ExecuteControllerMethod(c => c.RunGenerateKeywords(), controller);
     public static Task<IResult> GetDateFromVector(IDateFromVectorController controller) => ExecuteControllerMethod(c => c.GetDateFromVector(), controller);
 

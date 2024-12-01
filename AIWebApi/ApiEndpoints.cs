@@ -7,6 +7,14 @@ public static class ApiEndpoints
     public static WebApplication RegisterEndpoints(this WebApplication app)
     {
         app.MapGet("/", () => "Hello World!");
+        app.MapGet("/clearFiles", ApiHandlers.ClearLogFiles)
+            .Produces<bool>()
+            .WithDescription("Clear work data files")
+            .WithTags("Clean project api");
+        app.MapGet("/clearWorkDirectory", ApiHandlers.ClearSortFiles)
+            .Produces<bool>()
+            .WithDescription("Clear work directory")
+            .WithTags("Clean project api");
         app.MapGet("/preWork", ApiHandlers.PreWork)
             .Produces<ResponseDto>()
             .WithDescription("PreWork api task")
@@ -54,10 +62,6 @@ public static class ApiEndpoints
         app.MapGet("/sortFiles", ApiHandlers.RunSortFiles)
             .Produces<ResponseDto>()
             .WithDescription("Sort data files")
-            .WithTags("Api for AI_devs3");
-        app.MapGet("/clearFiles", ApiHandlers.ClearSortFiles)
-            .Produces<bool>()
-            .WithDescription("Clear data files")
             .WithTags("Api for AI_devs3");
         app.MapGet("/generateKeywords", ApiHandlers.RunGenerateKeywords)
             .Produces<ResponseDto>()

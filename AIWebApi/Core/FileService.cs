@@ -28,6 +28,8 @@ public interface IFileService
 
     string GetFileName(string fileName);
 
+    void DeleteFile(string fileName);
+
     void ClearDataFolder();
 
     void UnzipFileToFolder(string fileName, string unzipPath, string? password = null);
@@ -112,6 +114,12 @@ public class FileService : IFileService
             using Archive archive = new(zipFilePath, options);
             archive.ExtractToDirectory(outputDirectory);
         }
+    }
+
+    public void DeleteFile(string fileName)
+    {
+        string filePath = SetFilePath(fileName);
+        File.Delete(filePath);
     }
 
     public void ClearDataFolder()

@@ -17,7 +17,7 @@ public enum Role
 public enum ImageType
 {
     [Description("image/png")]
-    Png
+    Png,
 }
 
 public class ImageDto(BinaryData binaryData, ImageType imageType)

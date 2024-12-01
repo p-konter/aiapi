@@ -17,4 +17,8 @@
     <PackageReference Include="Swashbuckle.AspNetCore" Version="7.1.0" />
   </ItemGroup>
 
+  <PropertyGroup>
+	<NoWarn>SKEXP0001,SKEXP0010</NoWarn>
+  </PropertyGroup>
+
 </Project>

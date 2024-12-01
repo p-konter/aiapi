@@ -9,8 +9,10 @@ public interface ICensorshipController
     Task<ResponseDto> RunCensorshipLocal();
 }
 
-public class CensorshipController(IConfiguration configuration, IHttpService httpService, IKernelService kernelService, ILogger<CensorshipController> logger)
-    : BaseController(configuration, httpService), ICensorshipController
+public class CensorshipController(IConfiguration configuration,
+    IHttpService httpService,
+    IKernelService kernelService,
+    ILogger<CensorshipController> logger) : BaseController(configuration, httpService), ICensorshipController
 {
     private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<CensorshipController> _logger = logger;

@@ -1,11 +1,11 @@
 ﻿namespace AIWebApi.Core;
 
-public abstract class BaseController(IConfiguration configuration, IHttpService httpService)
+public class BaseController(IConfiguration configuration, IHttpService httpService)
 {
     protected readonly IConfiguration _configuration = configuration;
     protected readonly IHttpService _httpService = httpService;
 
-    private const string ApiKeyConfigName = "ApiKey";
+    protected const string ApiKeyConfigName = "ApiKey";
 
     protected Uri GetUrl(string key) => new(_configuration.GetSection("Urls").GetStrictValue<string>(key));
 

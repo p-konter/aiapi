@@ -1,3 +1,4 @@
+using AIWebApi.Tasks;
 using AIWebApi.Tasks._00_PreWork;
 using AIWebApi.Tasks._01_FillForm;
 using AIWebApi.Tasks._02_Verify;
@@ -19,6 +20,7 @@ public static class Controllers
     {
         services.AddScoped<IAudioReportController, AudioReportController>();
         services.AddScoped<ICensorshipController, CensorshipController>();
+        services.AddScoped<ICleanController, CleanController>();
         services.AddScoped<IDateFromVectorController, DateFromVectorController>();
         services.AddScoped<IFileCorrectionController, FileCorrectionController>();
         services.AddScoped<IFillFormController, FillFormController>();
