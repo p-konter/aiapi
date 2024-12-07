@@ -12,6 +12,8 @@ namespace AIWebApi.Core;
 
 public interface IKernelService
 {
+    void AddPlugin<T>(T plugin) where T : class;
+
     void ClearHistory();
 
     Task<MessageDto> Chat(AIModel model, IList<MessageDto> messages, bool returnJson = false);
@@ -57,10 +59,9 @@ public class KernelService : IKernelService
 
         builder.Services.AddLogging(services => services.AddConsole().SetMinimumLevel(LogLevel.Information));
         _kernel = builder.Build();
-
-        // Add plugins
-        //_kernel.Plugins.AddFromType<LightsPlugin>("Lights");
     }
+
+    public void AddPlugin<T>(T plugin) where T : class => _kernel.Plugins.AddFromObject(plugin);
 
     public async Task<string> SimpleChat(AIModel model, string message)
     {
@@ -75,11 +76,12 @@ public class KernelService : IKernelService
 
         OpenAIPromptExecutionSettings executionSettings = new()
         {
-            ResponseFormat = returnJson ? "json_object" : "text"
+            ResponseFormat = returnJson ? "json_object" : "text",
+            FunctionChoiceBehavior = FunctionChoiceBehavior.Auto()
         };
 
         IChatCompletionService chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>(model.GetDescription());
-        ChatMessageContent result = await chatCompletionService.GetChatMessageContentAsync(History, executionSettings);
+        ChatMessageContent result = await chatCompletionService.GetChatMessageContentAsync(History, executionSettings, _kernel);
 
         string response = (result.Content != null) ? result.Content.Replace("```json", "").Replace("```", "").Trim() : string.Empty;
         _logger.LogInformation("Chat completion: {completion}", response);

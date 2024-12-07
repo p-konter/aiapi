@@ -71,6 +71,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Get date with vector data")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/extractFromSql", ApiHandlers.ExtractFromSql)
+            .Produces<ResponseDto>()
+            .WithDescription("Extract data from SQL")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }

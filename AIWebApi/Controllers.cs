@@ -11,6 +11,7 @@ using AIWebApi.Tasks._08_GenerateRobot;
 using AIWebApi.Tasks._09_SortFiles;
 using AIWebApi.Tasks._11_GenerateKeywords;
 using AIWebApi.Tasks._12_DateFromVector;
+using AIWebApi.Tasks._13_ExtractFromSql;
 
 namespace AIWebApi;
 
@@ -22,6 +23,7 @@ public static class Controllers
         services.AddScoped<ICensorshipController, CensorshipController>();
         services.AddScoped<ICleanController, CleanController>();
         services.AddScoped<IDateFromVectorController, DateFromVectorController>();
+        services.AddScoped<IExtractFromSqlController, ExtractFromSqlController>();
         services.AddScoped<IFileCorrectionController, FileCorrectionController>();
         services.AddScoped<IFillFormController, FillFormController>();
         services.AddScoped<IGenerateKeywordsController, GenerateKeywordsController>();
