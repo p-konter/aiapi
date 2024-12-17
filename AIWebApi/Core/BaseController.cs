@@ -1,4 +1,6 @@
-﻿namespace AIWebApi.Core;
+﻿using HtmlAgilityPack;
+
+namespace AIWebApi.Core;
 
 public class BaseController(IConfiguration configuration, IHttpService httpService)
 {
@@ -16,5 +18,19 @@ public class BaseController(IConfiguration configuration, IHttpService httpServi
 
         RequestDto<T> request = new(taskName, apiKey, answer);
         return await _httpService.PostJson<ResponseDto>(sendAnswerUrl, request);
+    }
+
+    protected Uri GetUrlWithKey(string keyName)
+    {
+        Uri url = GetUrl(keyName);
+        string apiKey = _configuration.GetStrictValue<string>("ApiKey");
+        return new($"{url.ToString().Replace("{key}", apiKey)}");
+    }
+
+    protected static HtmlDocument CreateHtmlDocument(string form)
+    {
+        HtmlDocument document = new();
+        document.LoadHtml(form);
+        return document;
     }
 }

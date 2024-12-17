@@ -9,6 +9,7 @@ using AIWebApi.Tasks._06_AudioReport;
 using AIWebApi.Tasks._07_RecognizeMap;
 using AIWebApi.Tasks._08_GenerateRobot;
 using AIWebApi.Tasks._09_SortFiles;
+using AIWebApi.Tasks._10_AnswerQuestions;
 using AIWebApi.Tasks._11_GenerateKeywords;
 using AIWebApi.Tasks._12_DateFromVector;
 using AIWebApi.Tasks._13_ExtractFromSql;
@@ -31,10 +32,10 @@ public static class ApiHandlers
     public static Task<IResult> RunRecognizeMap(IRecognizeMapController controller) => ExecuteControllerMethod(c => c.RunRecognizeMap(), controller);
     public static Task<IResult> RunRobotGeneration(IGenerateRobotController controller) => ExecuteControllerMethod(c => c.RunRobotGeneration(), controller);
     public static Task<IResult> RunSortFiles(ISortFilesController controller) => ExecuteControllerMethod(c => c.RunSortFiles(), controller);
+    public static Task<IResult> RunAnswerQuestions(IAnswerQuestionsController controller) => ExecuteControllerMethod(c => c.RunAnswerQuestions(), controller);
     public static Task<IResult> RunGenerateKeywords(IGenerateKeywordsController controller) => ExecuteControllerMethod(c => c.RunGenerateKeywords(), controller);
     public static Task<IResult> GetDateFromVector(IDateFromVectorController controller) => ExecuteControllerMethod(c => c.GetDateFromVector(), controller);
     public static Task<IResult> ExtractFromSql(IExtractFromSqlController controller) => ExecuteControllerMethod(c => c.ExtractFromSql(), controller);
-
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {
         TResponse response = await method(controller);

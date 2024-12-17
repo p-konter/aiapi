@@ -9,6 +9,7 @@ using AIWebApi.Tasks._06_AudioReport;
 using AIWebApi.Tasks._07_RecognizeMap;
 using AIWebApi.Tasks._08_GenerateRobot;
 using AIWebApi.Tasks._09_SortFiles;
+using AIWebApi.Tasks._10_AnswerQuestions;
 using AIWebApi.Tasks._11_GenerateKeywords;
 using AIWebApi.Tasks._12_DateFromVector;
 using AIWebApi.Tasks._13_ExtractFromSql;
@@ -19,6 +20,7 @@ public static class Controllers
 {
     public static IServiceCollection AddTasksControllers(this IServiceCollection services)
     {
+        services.AddScoped<IAnswerQuestionsController, AnswerQuestionsController>();
         services.AddScoped<IAudioReportController, AudioReportController>();
         services.AddScoped<ICensorshipController, CensorshipController>();
         services.AddScoped<ICleanController, CleanController>();

@@ -10,6 +10,8 @@ public interface IFileService
 
     void SetFolder(IList<string> paths);
 
+    void CreateFolder();
+
     string ChangeExtension(string fileName, string extension);
 
     string CheckFileExists(string fileName);
@@ -21,6 +23,8 @@ public interface IFileService
     FileStream ReadStream(string fileName);
 
     Task WriteTextFile(string fileName, string content);
+
+    Task WriteBinaryFile(string fileName, byte[] content);
 
     IEnumerable<string> GetFileNames();
 
@@ -44,6 +48,8 @@ public class FileService : IFileService
     public void SetFolder(string path) => Folder = path;
 
     public void SetFolder(IList<string> paths) => Folder = string.Join(Path.DirectorySeparatorChar, paths);
+
+    public void CreateFolder() => Directory.CreateDirectory(Folder);
 
     private string SetFilePath(string fileName)
     {
@@ -76,6 +82,15 @@ public class FileService : IFileService
     {
         string filePath = SetFilePath(fileName);
         await File.WriteAllTextAsync(filePath, content);
+    }
+
+    public async Task WriteBinaryFile(string fileName, byte[] content)
+    {
+        string filePath = SetFilePath(fileName);
+        if (!File.Exists(filePath))
+        {
+            await File.WriteAllBytesAsync(filePath, content);
+        }
     }
 
     public string CheckFileExists(string fileName)

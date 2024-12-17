@@ -22,10 +22,8 @@ public class GenerateRobotController(IConfiguration configuration, IHttpService 
 
     private async Task<PromptData> GetPrompt()
     {
-        Uri url = GetUrl("Robot");
-        string apiKey = _configuration.GetStrictValue<string>("ApiKey");
-        Uri robotUrl = new($"{url.ToString().Replace("{key}", apiKey)}");
-        return await _httpService.GetJson<PromptData>(robotUrl);
+        Uri url = GetUrlWithKey("Robot");
+        return await _httpService.GetJson<PromptData>(url);
     }
 
     private async Task<Uri> GenerateRobot(string description)

@@ -38,13 +38,6 @@ public class FillFormController(IConfiguration configuration, IHttpService httpS
         return new FillFormResponseDto(flag, filename.ToString());
     }
 
-    private static HtmlDocument CreateHtmlDocument(string form)
-    {
-        HtmlDocument document = new();
-        document.LoadHtml(form);
-        return document;
-    }
-
     private async Task<string> GetQuestion()
     {
         string page = await _httpService.GetString(GetUrl("XYZ"));

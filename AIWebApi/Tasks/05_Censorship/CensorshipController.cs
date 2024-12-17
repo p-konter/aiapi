@@ -46,9 +46,7 @@ public class CensorshipController(IConfiguration configuration,
 
     private async Task<string> GetFile()
     {
-        string apiKey = _configuration.GetStrictValue<string>("ApiKey");
-        Uri fileUrl = GetUrl("Censorship");
-        Uri url = new($"{fileUrl.ToString().Replace("{key}", apiKey)}");
+        Uri url = GetUrlWithKey("Censorship");
         return await _httpService.GetString(url);
     }
 

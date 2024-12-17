@@ -63,6 +63,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Sort data files; ToDo: reduce wrong answers, less randomness")
             .WithTags("ToDo for AI_devs3");
+        app.MapGet("/answerQuestions", ApiHandlers.RunAnswerQuestions)
+            .Produces<ResponseDto>()
+            .WithDescription("Answer question using data from document")
+            .WithTags("Api for AI_devs3");
         app.MapGet("/generateKeywords", ApiHandlers.RunGenerateKeywords)
             .Produces<ResponseDto>()
             .WithDescription("Generate kaywords to text files; ToDo: reduce wrong answers, less randomness")

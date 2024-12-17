@@ -8,6 +8,8 @@ public interface IHttpService
 
     Task<string> GetString(Uri url);
 
+    Task<byte[]> GetBinaryFile(Uri url);
+
     Task<string> Post(Uri url, string request, bool sendWithoutJsonHeader = false);
 
     Task<string> PostContent(Uri url, HttpContent content);
@@ -43,6 +45,13 @@ public class HttpService(IJsonService jsonService, ILogger<HttpService> logger) 
         string header = sendWithoutJsonHeader ? string.Empty : JsonHeader;
         StringContent content = new(request, Encoding.UTF8, header);
         return await PostContent(url, content);
+    }
+
+    public async Task<byte[]> GetBinaryFile(Uri url)
+    {
+        HttpResponseMessage response = await _httpClient.GetAsync(url);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadAsByteArrayAsync();
     }
 
     public async Task<T> PostJson<T>(Uri url, object request, bool sendWithoutJsonHeader = false)
