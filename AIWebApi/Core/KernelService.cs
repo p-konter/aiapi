@@ -61,7 +61,14 @@ public class KernelService : IKernelService
         _kernel = builder.Build();
     }
 
-    public void AddPlugin<T>(T plugin) where T : class => _kernel.Plugins.AddFromObject(plugin);
+    public void AddPlugin<T>(T plugin) where T : class
+    {
+        string pluginName = typeof(T).Name;
+        if (!_kernel.Plugins.TryGetPlugin(pluginName, out _))
+        {
+            _kernel.Plugins.AddFromObject(plugin);
+        }
+    }
 
     public async Task<string> SimpleChat(AIModel model, string message)
     {

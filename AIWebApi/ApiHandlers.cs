@@ -13,6 +13,7 @@ using AIWebApi.Tasks._10_AnswerQuestions;
 using AIWebApi.Tasks._11_GenerateKeywords;
 using AIWebApi.Tasks._12_DateFromVector;
 using AIWebApi.Tasks._13_ExtractFromSql;
+using AIWebApi.Tasks._14_FindLocation;
 
 namespace AIWebApi;
 
@@ -36,6 +37,8 @@ public static class ApiHandlers
     public static Task<IResult> RunGenerateKeywords(IGenerateKeywordsController controller) => ExecuteControllerMethod(c => c.RunGenerateKeywords(), controller);
     public static Task<IResult> GetDateFromVector(IDateFromVectorController controller) => ExecuteControllerMethod(c => c.GetDateFromVector(), controller);
     public static Task<IResult> ExtractFromSql(IExtractFromSqlController controller) => ExecuteControllerMethod(c => c.ExtractFromSql(), controller);
+    public static Task<IResult> FindLocation(IFindLocationController controller) => ExecuteControllerMethod(c => c.FindLocation(), controller);
+
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {
         TResponse response = await method(controller);

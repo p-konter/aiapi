@@ -13,6 +13,7 @@ using AIWebApi.Tasks._10_AnswerQuestions;
 using AIWebApi.Tasks._11_GenerateKeywords;
 using AIWebApi.Tasks._12_DateFromVector;
 using AIWebApi.Tasks._13_ExtractFromSql;
+using AIWebApi.Tasks._14_FindLocation;
 
 namespace AIWebApi;
 
@@ -28,6 +29,7 @@ public static class Controllers
         services.AddScoped<IExtractFromSqlController, ExtractFromSqlController>();
         services.AddScoped<IFileCorrectionController, FileCorrectionController>();
         services.AddScoped<IFillFormController, FillFormController>();
+        services.AddScoped<IFindLocationController, FindLocationController>();
         services.AddScoped<IGenerateKeywordsController, GenerateKeywordsController>();
         services.AddScoped<IGenerateRobotController, GenerateRobotController>();
         services.AddScoped<ILabirynthController, LabirynthController>();

@@ -167,7 +167,7 @@ public class AnswerQuestionsController : BaseController, IAnswerQuestionsControl
         {
             node.Remove();
         }
-        
+
         IList<HtmlNode> textNodesToRemove = document.DocumentNode.SelectNodes("//text()");
         foreach (HtmlNode node in textNodesToRemove)
         {

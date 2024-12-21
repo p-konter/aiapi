@@ -79,6 +79,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Extract data from SQL")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/findLocation", ApiHandlers.FindLocation)
+            .Produces<ResponseDto>()
+            .WithDescription("Find location from Api")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
