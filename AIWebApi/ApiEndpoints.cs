@@ -83,6 +83,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Find location from Api")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/findPath", ApiHandlers.FindPath)
+            .Produces<ResponseDto>()
+            .WithDescription("Find path in graph database")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }

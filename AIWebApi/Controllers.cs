@@ -14,6 +14,7 @@ using AIWebApi.Tasks._11_GenerateKeywords;
 using AIWebApi.Tasks._12_DateFromVector;
 using AIWebApi.Tasks._13_ExtractFromSql;
 using AIWebApi.Tasks._14_FindLocation;
+using AIWebApi.Tasks._15_FindPath;
 
 namespace AIWebApi;
 
@@ -30,6 +31,7 @@ public static class Controllers
         services.AddScoped<IFileCorrectionController, FileCorrectionController>();
         services.AddScoped<IFillFormController, FillFormController>();
         services.AddScoped<IFindLocationController, FindLocationController>();
+        services.AddScoped<IFindPathController, FindPathController>();
         services.AddScoped<IGenerateKeywordsController, GenerateKeywordsController>();
         services.AddScoped<IGenerateRobotController, GenerateRobotController>();
         services.AddScoped<ILabirynthController, LabirynthController>();

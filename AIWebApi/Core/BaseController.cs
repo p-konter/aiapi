@@ -8,23 +8,21 @@ public class BaseController(IConfiguration configuration, IHttpService httpServi
     protected readonly IHttpService _httpService = httpService;
 
     protected const string ApiKeyConfigName = "ApiKey";
+    protected readonly string ApiKey = configuration.GetStrictValue<string>(ApiKeyConfigName);
 
     protected Uri GetUrl(string key) => new(_configuration.GetSection("Urls").GetStrictValue<string>(key));
 
     protected async Task<ResponseDto> SendAnswer<T>(string taskName, string urlKey, T answer)
     {
-        string apiKey = _configuration.GetStrictValue<string>(ApiKeyConfigName);
         Uri sendAnswerUrl = GetUrl(urlKey);
-
-        RequestDto<T> request = new(taskName, apiKey, answer);
+        RequestDto<T> request = new(taskName, ApiKey, answer);
         return await _httpService.PostJson<ResponseDto>(sendAnswerUrl, request);
     }
 
     protected Uri GetUrlWithKey(string keyName)
     {
         Uri url = GetUrl(keyName);
-        string apiKey = _configuration.GetStrictValue<string>("ApiKey");
-        return new($"{url.ToString().Replace("{key}", apiKey)}");
+        return new($"{url.ToString().Replace("{key}", ApiKey)}");
     }
 
     protected static HtmlDocument CreateHtmlDocument(string form)
@@ -32,5 +30,11 @@ public class BaseController(IConfiguration configuration, IHttpService httpServi
         HtmlDocument document = new();
         document.LoadHtml(form);
         return document;
+    }
+
+    protected async Task<SqlResponseDto> SendQuery(string query)
+    {
+        SqlRequestDto request = new("database", ApiKey, query);
+        return await _httpService.PostJson<SqlResponseDto>(GetUrl("ApiDB"), request);
     }
 }

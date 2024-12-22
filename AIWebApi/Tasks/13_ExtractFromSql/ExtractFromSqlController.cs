@@ -19,8 +19,6 @@ public class ExtractFromSqlController(
     private readonly IKernelService _kernelService = kernelService;
     private readonly ILogger<ExtractFromSqlController> _logger = loggerFactory.CreateLogger<ExtractFromSqlController>();
 
-    private readonly string ApiKey = configuration.GetStrictValue<string>("ApiKey");
-
     public async Task<ResponseDto> ExtractFromSql()
     {
         IList<string> tableNames = await GetTableNames();
@@ -33,7 +31,7 @@ public class ExtractFromSqlController(
     private async Task<IList<string>> GetTableNames()
     {
         Dictionary<string, string> tables = [];
-        ApiResponseDto response = await SendQuery("SHOW TABLES");
+        SqlResponseDto response = await SendQuery("SHOW TABLES");
         return response.Reply.SelectMany(dict => dict.Values).ToList();
     }
 
@@ -42,7 +40,7 @@ public class ExtractFromSqlController(
         IList<string> structure = [];
         foreach (string table in tableNames)
         {
-            ApiResponseDto response = await SendQuery($"SHOW CREATE TABLE {table}");
+            SqlResponseDto response = await SendQuery($"SHOW CREATE TABLE {table}");
             string createTable = response.Reply.SelectMany(dict => dict.Where(kvp => kvp.Key == "Create Table").Select(x => x.Value)).First();
             _logger.LogInformation("Create table for {table} is: {createTable}", table, createTable);
             structure.Add(createTable);
@@ -77,22 +75,9 @@ public class ExtractFromSqlController(
 
         OutputMessageDto outputMessage = _jsonService.Deserialize<OutputMessageDto>(answer.Message);
 
-        ApiResponseDto response = await SendQuery(outputMessage.Sql);
+        SqlResponseDto response = await SendQuery(outputMessage.Sql);
         return response.Reply.SelectMany(dict => dict.Values).Select(int.Parse).ToList();
-    }
-
-    private async Task<ApiResponseDto> SendQuery(string query)
-    {
-        ApiRequestDto request = new("database", ApiKey, query);
-        ApiResponseDto response = await _httpService.PostJson<ApiResponseDto>(GetUrl("ApiDB"), request);
-
-        _logger.LogInformation("Error: {error}", response.Error);
-        return response;
     }
 }
 
 public record OutputMessageDto(string Thinking, string Sql);
-
-public record ApiRequestDto(string Task, string Apikey, string Query);
-
-public record ApiResponseDto(string Error, IList<IDictionary<string, string>> Reply);
