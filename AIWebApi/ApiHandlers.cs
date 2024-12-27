@@ -15,6 +15,7 @@ using AIWebApi.Tasks._12_DateFromVector;
 using AIWebApi.Tasks._13_ExtractFromSql;
 using AIWebApi.Tasks._14_FindLocation;
 using AIWebApi.Tasks._15_FindPath;
+using AIWebApi.Tasks._16_EditPhoto;
 
 namespace AIWebApi;
 
@@ -40,6 +41,7 @@ public static class ApiHandlers
     public static Task<IResult> ExtractFromSql(IExtractFromSqlController controller) => ExecuteControllerMethod(c => c.ExtractFromSql(), controller);
     public static Task<IResult> FindLocation(IFindLocationController controller) => ExecuteControllerMethod(c => c.FindLocation(), controller);
     public static Task<IResult> FindPath(IFindPathController controller) => ExecuteControllerMethod(c => c.FindPath(), controller);
+    public static Task<IResult> RunPhotoEdit(IEditPhotoController controller) => ExecuteControllerMethod(c => c.RunPhotoEditing(), controller);
 
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {

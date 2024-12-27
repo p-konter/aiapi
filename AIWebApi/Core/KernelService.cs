@@ -22,6 +22,8 @@ public interface IKernelService
 
     Task<MessageDto> ImageChat(AIModel model, string fileName, string prompt);
 
+    Task<MessageDto> MultipleImageChat(AIModel model, List<string> fileNames, string prompt);
+
     Task<MessageDto> ProcessTextFile(AIModel model, string fileName, IList<MessageDto> messages, bool returnJson = false);
 
     Task<string> AudioTranscription(string fileName);
@@ -131,6 +133,24 @@ public class KernelService : IKernelService
         _logger.LogInformation("Image text: {text}", result.Content);
         await SaveProcessedData(fileName, result.Content);
 
+        return new MessageDto(Role.Assistant, result.Content ?? string.Empty);
+    }
+
+    public async Task<MessageDto> MultipleImageChat(AIModel model, List<string> fileNames, string prompt)
+    {
+        List<ImageDto> images = [];
+        foreach (string fileName in fileNames)
+        {
+            BinaryData file = await _fileService.ReadBinaryFile(fileName);
+            images.Add(new(file, ImageType.Png));
+        }
+        MessageDto message = new(Role.User, prompt, images);
+        History.Add(message.ToKernelMessage());
+
+        IChatCompletionService chatCompletionService = _kernel.GetRequiredService<IChatCompletionService>(model.GetDescription());
+        ChatMessageContent result = await chatCompletionService.GetChatMessageContentAsync(History);
+
+        _logger.LogInformation("Image text: {text}", result.Content);
         return new MessageDto(Role.Assistant, result.Content ?? string.Empty);
     }
 

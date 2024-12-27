@@ -15,6 +15,7 @@ using AIWebApi.Tasks._12_DateFromVector;
 using AIWebApi.Tasks._13_ExtractFromSql;
 using AIWebApi.Tasks._14_FindLocation;
 using AIWebApi.Tasks._15_FindPath;
+using AIWebApi.Tasks._16_EditPhoto;
 
 namespace AIWebApi;
 
@@ -27,6 +28,7 @@ public static class Controllers
         services.AddScoped<ICensorshipController, CensorshipController>();
         services.AddScoped<ICleanController, CleanController>();
         services.AddScoped<IDateFromVectorController, DateFromVectorController>();
+        services.AddScoped<IEditPhotoController, EditPhotoController>();
         services.AddScoped<IExtractFromSqlController, ExtractFromSqlController>();
         services.AddScoped<IFileCorrectionController, FileCorrectionController>();
         services.AddScoped<IFillFormController, FillFormController>();

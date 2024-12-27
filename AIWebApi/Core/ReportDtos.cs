@@ -1,6 +1,6 @@
 ﻿namespace AIWebApi.Core;
 
-public record ResponseDto(int Code, string Message);
+public record ResponseDto(int Code, string Message, List<string>? Hints);
 
 public record RequestDto<T>(string Task, string Apikey, T Answer);
 

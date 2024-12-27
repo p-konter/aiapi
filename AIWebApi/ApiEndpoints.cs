@@ -87,6 +87,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Find path in graph database")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/editPhoto", ApiHandlers.RunPhotoEdit)
+            .Produces<ResponseDto>()
+            .WithDescription("Edit photo by AI")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }

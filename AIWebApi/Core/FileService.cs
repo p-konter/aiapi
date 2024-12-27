@@ -49,7 +49,14 @@ public class FileService : IFileService
 
     public void SetFolder(IList<string> paths) => Folder = string.Join(Path.DirectorySeparatorChar, paths);
 
-    public void CreateFolder() => Directory.CreateDirectory(Folder);
+    public void CreateFolder()
+    {
+        if (Directory.Exists(Folder))
+        {
+            return;
+        }
+        Directory.CreateDirectory(Folder);
+    }
 
     private string SetFilePath(string fileName)
     {
