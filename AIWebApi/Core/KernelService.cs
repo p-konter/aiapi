@@ -55,6 +55,7 @@ public class KernelService : IKernelService
         // Add models
         builder.AddOpenAIChatCompletion(AIModel.Gpt4o.GetDescription(), openAIApiKey, serviceId: AIModel.Gpt4o.GetDescription());
         builder.AddOpenAIChatCompletion(AIModel.Gpt4oMini.GetDescription(), openAIApiKey, serviceId: AIModel.Gpt4oMini.GetDescription());
+        builder.AddOpenAIChatCompletion(AIModel.FineTuning.GetDescription(), openAIApiKey, serviceId: AIModel.FineTuning.GetDescription());
         builder.AddOpenAIAudioToText(AIModel.Whisper1.GetDescription(), openAIApiKey, serviceId: AIModel.Whisper1.GetDescription());
         builder.AddOpenAITextToImage(openAIApiKey, serviceId: AIModel.DallE3.GetDescription());
         builder.AddOpenAITextEmbeddingGeneration(AIModel.TextEmbedding3Small.GetDescription(), openAIApiKey, serviceId: AIModel.TextEmbedding3Small.GetDescription());
@@ -232,6 +233,8 @@ public enum AIModel
     Gpt4o,
     [Description("gpt-4o-mini")]
     Gpt4oMini,
+    [Description("ft:gpt-4o-mini-2024-07-18:pavel:aidevs:AjOIM8Rw")]
+    FineTuning,
     [Description("whisper-1")]
     Whisper1,
     [Description("dall-e-3")]

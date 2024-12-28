@@ -91,6 +91,14 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Edit photo by AI")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/prepareTuning", ApiHandlers.PrepareTuningData)
+            .Produces<string>()
+            .WithDescription("Prepare data to fine tuning")
+            .WithTags("Api for AI_devs3");
+        app.MapGet("/validateTuning", ApiHandlers.ValidateTuningData)
+            .Produces<ResponseDto>()
+            .WithDescription("Validate fine tuning data")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
