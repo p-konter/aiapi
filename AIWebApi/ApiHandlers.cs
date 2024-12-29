@@ -17,6 +17,7 @@ using AIWebApi.Tasks._14_FindLocation;
 using AIWebApi.Tasks._15_FindPath;
 using AIWebApi.Tasks._16_EditPhoto;
 using AIWebApi.Tasks._17_FineTuning;
+using AIWebApi.Tasks._18_Scrapping;
 
 namespace AIWebApi;
 
@@ -45,6 +46,7 @@ public static class ApiHandlers
     public static Task<IResult> RunPhotoEdit(IEditPhotoController controller) => ExecuteControllerMethod(c => c.RunPhotoEditing(), controller);
     public static Task<IResult> PrepareTuningData(IFineTuningController controller) => ExecuteControllerMethod(c => c.PrepareData(), controller);
     public static Task<IResult> ValidateTuningData(IFineTuningController controller) => ExecuteControllerMethod(c => c.ValidateData(), controller);
+    public static Task<IResult> RunScrapping(IScrappingController controller) => ExecuteControllerMethod(c => c.RunScrapping(), controller);
 
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {

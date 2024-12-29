@@ -17,6 +17,7 @@ using AIWebApi.Tasks._14_FindLocation;
 using AIWebApi.Tasks._15_FindPath;
 using AIWebApi.Tasks._16_EditPhoto;
 using AIWebApi.Tasks._17_FineTuning;
+using AIWebApi.Tasks._18_Scrapping;
 
 namespace AIWebApi;
 
@@ -41,6 +42,7 @@ public static class Controllers
         services.AddScoped<ILabirynthController, LabirynthController>();
         services.AddScoped<IPreWorkController, PreWorkController>();
         services.AddScoped<IRecognizeMapController, RecognizeMapController>();
+        services.AddScoped<IScrappingController, ScrappingController>();
         services.AddScoped<ISortFilesController, SortFilesController>();
         services.AddScoped<IVerifyController, VerifyController>();
 

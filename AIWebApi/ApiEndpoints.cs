@@ -99,6 +99,10 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Validate fine tuning data")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/webScrapping", ApiHandlers.RunScrapping)
+            .Produces<ResponseDto>()
+            .WithDescription("Scrap data from www")
+            .WithTags("Api for AI_devs3");
 
         return app;
     }
