@@ -1,3 +1,4 @@
+using AIWebApi.Core;
 using AIWebApi.Tasks;
 using AIWebApi.Tasks._00_PreWork;
 using AIWebApi.Tasks._01_FillForm;
@@ -18,6 +19,9 @@ using AIWebApi.Tasks._15_FindPath;
 using AIWebApi.Tasks._16_EditPhoto;
 using AIWebApi.Tasks._17_FineTuning;
 using AIWebApi.Tasks._18_Scrapping;
+using AIWebApi.Tasks._19_NavigateDrone;
+
+using Microsoft.AspNetCore.Mvc;
 
 namespace AIWebApi;
 
@@ -47,6 +51,13 @@ public static class ApiHandlers
     public static Task<IResult> PrepareTuningData(IFineTuningController controller) => ExecuteControllerMethod(c => c.PrepareData(), controller);
     public static Task<IResult> ValidateTuningData(IFineTuningController controller) => ExecuteControllerMethod(c => c.ValidateData(), controller);
     public static Task<IResult> RunScrapping(IScrappingController controller) => ExecuteControllerMethod(c => c.RunScrapping(), controller);
+    public static Task<IResult> StartNavigate(INavigateDroneController controller) => ExecuteControllerMethod(c => c.StartNavigate(), controller);
+    
+    public static async Task<IResult> Flight(INavigateDroneController controller, [FromBody] FlightRequest data)
+    {
+        FlightResponse response = await controller.Flight(data);
+        return Results.Json(response);
+    }
 
     private static async Task<IResult> ExecuteControllerMethod<TController, TResponse>(Func<TController, Task<TResponse>> method, TController controller)
     {

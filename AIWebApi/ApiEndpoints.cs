@@ -6,7 +6,6 @@ public static class ApiEndpoints
 {
     public static WebApplication RegisterEndpoints(this WebApplication app)
     {
-        app.MapGet("/", () => "Hello World!");
         app.MapGet("/clearFiles", ApiHandlers.ClearLogFiles)
             .Produces<bool>()
             .WithDescription("Clear work data files")
@@ -103,6 +102,14 @@ public static class ApiEndpoints
             .Produces<ResponseDto>()
             .WithDescription("Scrap data from www")
             .WithTags("Api for AI_devs3");
+        app.MapGet("/startNavigate", ApiHandlers.StartNavigate)
+            .Produces<ResponseDto>()
+            .WithDescription("Start navigation")
+            .WithTags("Api for AI_devs3");
+        app.MapPost("/flight", ApiHandlers.Flight)
+            .Produces<FlightResponse>()
+            .WithDescription("Flight")
+            .WithTags("Local AI_devs3 automat");
 
         return app;
     }

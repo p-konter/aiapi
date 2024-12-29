@@ -18,6 +18,7 @@ using AIWebApi.Tasks._15_FindPath;
 using AIWebApi.Tasks._16_EditPhoto;
 using AIWebApi.Tasks._17_FineTuning;
 using AIWebApi.Tasks._18_Scrapping;
+using AIWebApi.Tasks._19_NavigateDrone;
 
 namespace AIWebApi;
 
@@ -40,6 +41,7 @@ public static class Controllers
         services.AddScoped<IGenerateKeywordsController, GenerateKeywordsController>();
         services.AddScoped<IGenerateRobotController, GenerateRobotController>();
         services.AddScoped<ILabirynthController, LabirynthController>();
+        services.AddScoped<INavigateDroneController, NavigateDroneController>();
         services.AddScoped<IPreWorkController, PreWorkController>();
         services.AddScoped<IRecognizeMapController, RecognizeMapController>();
         services.AddScoped<IScrappingController, ScrappingController>();

@@ -14,6 +14,8 @@ builder.Services.AddTasksControllers();
 
 WebApplication app = builder.Build();
 
+app.UseHttpsRedirection();
+
 app.UseSwagger();
 app.UseSwaggerUI();
 

@@ -11,3 +11,7 @@ public record VerifyDto(string Text, int MsgID);
 public record SqlRequestDto(string Task, string Apikey, string Query);
 
 public record SqlResponseDto(string Error, IList<IDictionary<string, string>> Reply);
+
+public record FlightRequest(string Instruction);
+
+public record FlightResponse(string Description);
